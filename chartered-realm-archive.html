@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cornerstone Library Archive: Terminal 04</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap');
+
+:root{
+  --shell:#151209;
+  --shell-edge:#0d0b06;
+  --panel:#d6cca8;
+  --panel-recessed:#c2b78e;
+  --panel-deep:#b3a67a;
+  --ink:#2b2618;
+  --ink-muted:#5f5842;
+  --ink-faint:#8a7f60;
+  --amber:#8a5a1e;
+  --amber-bright:#b3792a;
+  --rust:#7c3b30;
+  --rust-bright:#9c4a3c;
+  --line:#a89a6e;
+  --line-soft:#bcb185;
+  --corrupt:#7a725c;
+  --mono:'Space Mono', ui-monospace, 'Courier New', monospace;
+  --serif:'Source Serif 4', Georgia, serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  background:var(--shell-edge);
+  font-family:var(--mono);
+  color:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh;
+  padding:18px;
+}
+
+/* ===== outer terminal shell ===== */
+.terminal{
+  width:100%;
+  max-width:1180px;
+  background:var(--shell);
+  border-radius:10px;
+  padding:14px;
+  box-shadow:
+    0 0 0 1px #000,
+    0 30px 60px -20px rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.03);
+}
+
+.bezel-label{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:2px 10px 10px;
+  color:var(--ink-faint);
+  font-size:10px;
+  letter-spacing:.14em;
+}
+.bezel-label .dots{display:flex;gap:6px;}
+.bezel-label .dots span{width:6px;height:6px;border-radius:50%;background:#3a3527;display:inline-block;}
+
+.screen{
+  background:var(--panel);
+  border-radius:4px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25), inset 0 2px 30px rgba(0,0,0,.15);
+  overflow:hidden;
+  position:relative;
+}
+
+/* subtle scanline / crt texture */
+.screen::before{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.028) 0px,
+    rgba(0,0,0,0.028) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode:multiply;
+  z-index:5;
+}
+
+/* ===== status bar ===== */
+.statusbar{
+  background:var(--ink);
+  color:var(--panel);
+  font-size:11px;
+  letter-spacing:.06em;
+  padding:8px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:2px solid #000;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.statusbar .left{display:flex;align-items:center;gap:10px;}
+.statusbar .blink{
+  width:7px;height:7px;border-radius:50%;
+  background:#c9a13a;
+  animation:blink 2.4s infinite;
+  flex:none;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+.statusbar .integrity{color:var(--rust-bright);}
+
+/* ===== layout ===== */
+.body-grid{
+  display:grid;
+  grid-template-columns:260px 1fr;
+  grid-template-rows:1fr;
+  height:74vh;
+  height:74dvh;
+  min-height:600px;
+}
+@media (max-width:760px){
+  .body-grid{grid-template-columns:1fr; grid-template-rows:auto 1fr; height:82vh; height:82dvh; min-height:420px;}
+  .nav{max-height:220px;}
+}
+
+/* ===== nav ===== */
+.nav{
+  background:var(--panel-recessed);
+  border-right:2px solid var(--line);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  padding:14px 0 20px;
+  min-height:0;
+}
+.nav-search{
+  margin:0 14px 14px;
+  display:flex;
+  align-items:center;
+  background:var(--panel-deep);
+  border:1px solid var(--line);
+  padding:6px 8px;
+}
+.nav-search input{
+  background:transparent;
+  border:none;
+  outline:none;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--ink);
+  width:100%;
+}
+.nav-search input::placeholder{color:var(--ink-faint);}
+.nav-search .glyph{color:var(--ink-faint);margin-right:6px;font-size:12px;}
+
+.cat{
+  margin-bottom:4px;
+}
+.cat-head{
+  font-size:10.5px;
+  letter-spacing:.13em;
+  color:var(--ink-muted);
+  padding:10px 14px 6px;
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  border-top:1px solid var(--line-soft);
+  margin-top:6px;
+}
+.cat:first-of-type .cat-head{border-top:none;margin-top:0;}
+.cat-head .count{color:var(--ink-faint);font-weight:normal;}
+
+.entry{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  padding:7px 14px 7px 20px;
+  cursor:pointer;
+  font-size:12.5px;
+  color:var(--ink);
+  border-left:3px solid transparent;
+}
+.entry .code{
+  font-size:10px;
+  color:var(--ink-faint);
+  flex:none;
+}
+.entry:hover{background:var(--panel-deep);}
+.entry.active{
+  background:var(--panel-deep);
+  border-left:3px solid var(--amber);
+  color:var(--amber);
+  font-weight:700;
+}
+.entry.stub{
+  color:var(--ink-faint);
+  font-style:italic;
+  cursor:default;
+}
+.entry.stub:hover{background:none;}
+
+/* ===== main record panel ===== */
+.main{
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  padding:0;
+  position:relative;
+  min-height:0;
+}
+.record{
+  padding:28px 40px 48px;
+  animation:fadein .25s ease;
+}
+@keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+.rec-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:2px solid var(--line);
+  padding-bottom:14px;
+  margin-bottom:22px;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.rec-code{
+  font-size:11px;
+  color:var(--ink-faint);
+  letter-spacing:.1em;
+  margin-bottom:6px;
+}
+.rec-title{
+  font-family:var(--serif);
+  font-size:30px;
+  font-weight:700;
+  color:var(--ink);
+  line-height:1.15;
+}
+.rec-meta{
+  font-size:10.5px;
+  color:var(--ink-faint);
+  text-align:right;
+  line-height:1.7;
+  white-space:nowrap;
+}
+
+.rec-body{
+  font-family:var(--serif);
+  font-size:16px;
+  line-height:1.75;
+  color:var(--ink);
+  max-width:70ch;
+}
+.rec-body p{margin:0 0 16px;}
+.rec-body h4{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.1em;
+  color:var(--ink-muted);
+  margin:26px 0 10px;
+  text-transform:uppercase;
+}
+.rec-body .corrupt{
+  color:var(--corrupt);
+  font-style:italic;
+  font-family:var(--mono);
+  font-size:13px;
+}
+
+/* fragment / testimony blocks */
+.fragment{
+  background:var(--panel-deep);
+  border-left:3px solid var(--amber);
+  padding:14px 18px;
+  margin:18px 0;
+  font-size:14.5px;
+}
+.fragment .src{
+  font-family:var(--mono);
+  font-size:10.5px;
+  color:var(--ink-muted);
+  letter-spacing:.05em;
+  margin-top:8px;
+  display:block;
+}
+
+/* timeline */
+.tl-row{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:16px;
+  padding:14px 0;
+  border-top:1px solid var(--line-soft);
+}
+.tl-row:first-of-type{border-top:none;}
+.tl-year{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--amber);
+  padding-top:2px;
+}
+.tl-text{font-size:15px;line-height:1.65;}
+
+/* ===== redaction / corruption effects ===== */
+.redact{
+  background:#1c140c;
+  color:transparent;
+  border-radius:1px;
+  padding:0 3px;
+  display:inline-block;
+  user-select:none;
+}
+.tear-fragment{
+  background:var(--panel-deep);
+  border:1px dashed var(--rust);
+  padding:14px 16px;
+  margin:20px 0;
+  font-style:italic;
+  font-size:14px;
+  color:var(--ink-muted);
+  line-height:1.6;
+}
+.record.corrupted{ position:relative; }
+.record.corrupted .rec-title{ color:var(--rust); }
+.record.corrupted::before{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,
+    rgba(124,59,48,0.05) 0px, rgba(124,59,48,0.05) 2px,
+    transparent 2px, transparent 5px
+  );
+  animation:staticflicker 2.6s infinite steps(2);
+}
+@keyframes staticflicker{ 0%,100%{opacity:.55;} 50%{opacity:.15;} }
+
+.footer-strip{
+  margin-top:36px;
+  padding-top:14px;
+  border-top:1px solid var(--line-soft);
+  font-size:10.5px;
+  color:var(--ink-faint);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-track{background:var(--panel-recessed);}
+::-webkit-scrollbar-thumb{background:var(--panel-deep);border:2px solid var(--panel-recessed);}
+</style>
+</head>
+<body>
+<a href="chartered-realm-map.html" style="position:fixed;top:8px;left:8px;z-index:999;background:rgba(0,0,0,0.6);color:#ecdfc0;font-family:monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:3px;text-decoration:none;border:1px solid rgba(255,255,255,0.25);">&#8592; Map</a>
+
+<div class="terminal">
+  <div class="bezel-label">
+    <span>CORNERSTONE LIBRARY ARCHIVE · TERMINAL 04</span>
+    <span class="dots"><span></span><span></span><span></span></span>
+  </div>
+
+  <div class="screen">
+    <div class="statusbar">
+      <div class="left">
+        <span class="blink"></span>
+        <span>ARCHIVE ONLINE, UNATTENDED SINCE LAST QUERY</span>
+      </div>
+      <div class="right integrity">SIGNAL INTEGRITY: 61% · RECORDS PART 1 OF ??</div>
+    </div>
+
+    <div class="body-grid">
+      <nav class="nav" id="nav">
+        <div class="nav-search">
+          <span class="glyph">⌕</span>
+          <input type="text" id="searchBox" placeholder="search records...">
+        </div>
+        <div id="navTree"></div>
+      </nav>
+
+      <main class="main" id="main"></main>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA MODEL
+   Add future parts by appending new categories/entries here.
+   ============================================================ */
+const DATA = [
+  {
+    cat: "ORIENTATION",
+    code: "ORI",
+    entries: [
+      {
+        id: "welcome",
+        code: "ORI–000",
+        title: "The Library, and What Sits in the Back of It",
+        access: "public",
+        meta: "LAST ACCESSED: UNKNOWN · CLASSIFICATION: GENERAL",
+        body: `
+          <p>The door hasn't been oiled in longer than anyone currently breathing has been alive, and it complains the whole way open. What's behind it used to be Cornerstone's public library, back when the city still produced things worth writing down on purpose. It does not smell like a library. It smells like dust that has had seven hundred years to settle.</p>
+          <p>Whoever built this place did not build it to be read. Pull a volume off any shelf and it is rarely a book in any useful sense: contract logs, shipping manifests, minutes from meetings about other meetings, page after page of raw information that nobody ever came back to organize into something a person could actually use. It is less a library than a warehouse someone once optimistically labeled a library. Seven hundred years of unsorted data, and no one left with the coordination to sort it.</p>
+          <p>Past the collapsed shelving, in an alcove at the back that the rest of the room's decay somehow hasn't reached, sits a terminal. Something is set into the housing at its rear: a small crystal, dull at a glance, faintly warm if you get close enough to notice. The craft is unmistakably old-Compact work, the same resonance-cut style the record archives attribute to the Concord Chain, though nothing on file explains how a piece of that scale ended up mounted in the back of a public library. Everything else in this room is inert. This is not.</p>
+          <p>The dust on the floor in front of it is wrong. Not absent, just disturbed, the kind of pattern a chair makes when someone has sat here recently and left no other trace. No name, no note, nothing to explain it. But the terminal still works, and some of what's stored on it is a good deal newer than a terminal this old has any right to know.</p>
+          <p class="corrupt">[ SELECT A RECORD FROM THE DIRECTORY AT LEFT ]</p>
+        `
+      }
+    ]
+  },
+  {
+    cat: "THE SEVERANCE",
+    code: "SEV",
+    entries: [
+      {
+        id: "compact",
+        code: "SEV–001",
+        title: "The Age of the Great Compact",
+        access: "public",
+        meta: "PERIOD: ~800–700 YRS AGO · CLASSIFICATION: GENERAL",
+        body: `
+          <p>The old texts call it the Age of the Great Compact, a span of roughly a century when the three peoples of the realm did not merely coexist but built together, deliberately, as a matter of shared practice.</p>
+          <p>Elves were master artisans; their work was made to last centuries, and much of it still stands, uncredited, under later human construction. Dwarves were master traders and engineers, their supply lines running mountain to sea without a single unaccounted shipment. And humans held the position that, at the time, seemed the least glamorous of the three: they managed. Projects, programs, portfolios, change: the connective work of turning three peoples' incompatible strengths into a single functioning effort.</p>
+          <p>Cornerstone was founded in this period, at the convergence of three river valleys, named for the plainest possible virtue: the piece everything else depends on, that nobody notices until it's gone.</p>
+          <p>The Compact's single greatest undertaking was the Concord Chain: a network of linked relay-towers strung between every major settlement of the three peoples, built so that a decision made in one place could be felt in another before the day was out. No single people could have built it alone. Elven crystal-craft held the resonance, dwarven engineering carried the load and kept it running, and human coordination decided what the Chain was for and who it served. It was not a weapon and not a wonder for its own sake. It was coordination given a physical shape, the whole premise of the Compact made into something you could point at.</p>
+          <h4>The Core Truth</h4>
+          <div class="fragment">
+            The old world was not held together by conquest, prophecy, or divine obedience. It was held together by coordination. The peoples of the Realm were profoundly different, and their strengths did not naturally combine on their own. The old human gift was the ability to make expertise usable across boundaries.
+          </div>
+        `
+      },
+      {
+        id: "severance-event",
+        code: "SEV–002",
+        title: "The Severance",
+        access: "public",
+        meta: "PERIOD: ~700 YRS AGO · CLASSIFICATION: CONTESTED",
+        body: `
+          <p>Something ended the Great Compact roughly seven hundred years ago. What, exactly, depends entirely on who you ask, and the terminal has never been able to reconcile the accounts on file. What is not contested: a human faction opened the gates from within. The elves were exiled or withdrew. The dwarves retreated to the mountains and have not meaningfully returned. The orcs lost their most significant diplomatic counterpart and have been dealing with the consequences of that vacancy ever since. And humanity did not merely lose its allies; it lost something in itself. The instinctive trust in coordination, planning, vision, and shared execution did not degrade. It vanished, all at once, the way a language vanishes when the last fluent speaker dies mid-sentence.</p>
+          <h4>Competing Accounts on File</h4>
+          <div class="fragment">
+            <strong>Human civic record (Cornerstone archive standard):</strong> "A betrayal from within, motive unrecorded or deliberately struck. The elves and dwarves chose to leave rather than help us rebuild what was broken. We do not know why they abandoned us in our weakest hour."
+            <span class="src">SOURCE: Cornerstone Chancellery, redated copy, provenance uncertain</span>
+          </div>
+          <div class="fragment">
+            <strong>Dwarven position (secondhand, via trade envoy transcripts):</strong> Withdrawal was not abandonment but audit: a formal, considered judgment that human institutions could no longer be relied upon to honor what they signed. The withdrawal is described as a technical finding, not a grievance.
+            <span class="src">SOURCE: Trade envoy correspondence, Cornerstone Merchant Guild archive</span>
+          </div>
+          <div class="fragment">
+            <strong>Elven position (fragmentary, translated):</strong> The exile is remembered as expulsion, not departure. The elves describe being pushed out by a human faction that saw their permanence as a rebuke, and frame the loss of human coordination not as tragedy but as the natural consequence of a people who broke faith with everyone at once.
+            <span class="src">SOURCE: Partial translation, provenance unverifiable</span>
+          </div>
+          <div class="fragment">
+            <strong>Orcish oral tradition (as recorded by human ethnographers, likely distorted):</strong> The Severance is treated less as a human tragedy than as the day humans stopped being useful to negotiate with. The clans do not mourn the Compact; they mourn the fact that its collapse pushed human expansion into orcish land with none of the old diplomatic machinery left to manage it.
+            <span class="src">SOURCE: Human ethnographic notes, bias unaddressed</span>
+          </div>
+          <p class="corrupt">[ RECORD GAP: no account on file explains why the capacity for coordination itself, not merely the alliance, was lost. ]</p>
+        `
+      },
+      {
+        id: "concord-chain",
+        code: "SEV–003",
+        title: "The Concord Chain, Gone Dark",
+        access: "public",
+        meta: "TYPE: INFRASTRUCTURE RECORD · CLASSIFICATION: GENERAL",
+        body: `
+          <p>Every relay-tower in the Concord Chain went dark on the same night, by every account that survives, regardless of distance from Cornerstone or from each other. Towers a week's ride apart stopped within hours of one another. This detail is one of the few points every competing account of the Severance agrees on, which archivists have long found more unsettling than the disagreements.</p>
+          <p>Most towers still stand. None have been successfully relit. Attempts have been made, roughly once a generation, by guild engineers confident that the failure was mechanical rather than something else. Every attempt on record ends the same way: the tower accepts the work, holds a charge for a moment, and goes dark again, as if something on the other end of the line declines to answer.</p>
+          <div class="fragment">
+            <strong>Dwarven engineering assessment (formal finding, three generations ago):</strong> The relay mechanism itself is sound and fully repairable. The failure is not structural. No further explanation was recorded, or none survives.
+            <span class="src">SOURCE: Deep Hold engineering charter, partial copy</span>
+          </div>
+          <p class="corrupt">[ RECORD GAP: no successful relighting of any tower is on file, in seven hundred years. ]</p>
+        `
+      },
+      {
+        id: "audit-shard",
+        code: "SEV–004",
+        title: "Artifact: Dwarf Audit-Shard, Old Foundry Wall",
+        access: "public",
+        meta: "TYPE: PHYSICAL FRAGMENT · CLASSIFICATION: GENERAL",
+        body: `
+          <p>Recovered from a collapsed section of the Old Foundry Wall. Script is formal Dwarven trade-record notation, unusually blunt in tone for the form. Presented here without correction.</p>
+          <div class="fragment">
+            "The third audit found that the charter house had recorded all decisions correctly and honored none of them. The seals were genuine. The obligations were not. We withdrew not from contempt but from a technical judgment: humans were no longer useful."
+            <span class="src">SOURCE: Old Foundry Wall, audit-shard fragment, authenticity high</span>
+          </div>
+          <p>Archivists disagree on whether "no longer useful" refers to the Compact's collapse or predates it, implying dwarven withdrawal may have been a contributing cause of the Severance rather than only a consequence. No terminal record resolves this.</p>
+        `
+      },
+      {
+        id: "timeline",
+        code: "SEV–005",
+        title: "Timeline of the Realm",
+        access: "public",
+        meta: "SOURCE: COMPILED, MULTIPLE ARCHIVES · CLASSIFICATION: GENERAL",
+        body: `
+          <p>Compiled from surviving civic, trade, and ecclesiastical calendars. Dating is approximate before the Compact and grows more reliable moving forward.</p>
+          <div class="tl-row">
+            <div class="tl-year">DEEP PAST</div>
+            <div class="tl-text">The Great Wyrms hold dominion. Orcish clans roam the Central Plains freely. The elven Dominion exists but shows no interest in the rest of the continent. Humans are nomadic.</div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-year">~1,200 YRS AGO</div>
+            <div class="tl-text">First human settlements. A coastal trading post grows into Varath, now long destroyed. Humans expand inland along orcish trade routes: the beginning of territorial encroachment.</div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-year">~800 YRS AGO</div>
+            <div class="tl-text">The Age of the Great Compact. Elves, dwarves, and humans build together. Cornerstone is founded at the convergence of three river valleys. The Concord Chain is raised, tower by tower, across the settlements of all three peoples. Peak of human coordination capability.</div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-year">~700 YRS AGO</div>
+            <div class="tl-text">The Severance. A human faction betrays from within and opens the gates, for reasons that remain politically contested. Elves are exiled; dwarves withdraw. The human capacity for organized effort is destroyed or hidden, accounts differ. The Great Compact collapses. Orcs lose their primary diplomatic counterpart. Every tower of the Concord Chain goes dark within the same night.</div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-year">~400 YRS AGO</div>
+            <div class="tl-text">The Compact of Guilds. Cornerstone's first serious post-Severance governance attempt: five guild masters agree to shared trade rules. Holds for sixty years before collapsing into the First Guild War. Its failure is why any new proposal for guild cooperation is met with open suspicion.</div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-year">~700 YRS AGO TO NOW</div>
+            <div class="tl-text">No single event marks this period. The throne simply continues, generation after generation, the way it always has: unbroken succession, unearned by any demonstrated ability, upheld by ceremony and a divine claim no one currently alive can verify or organize enough to challenge.</div>
+          </div>
+          <div class="tl-row">
+            <div class="tl-year">PRESENT DAY</div>
+            <div class="tl-text">An orc clan leader presses a siege against Cornerstone, rooted in a legitimate territorial grievance over ancestral orcish land. The city has not faced a crisis of this scale since the Severance itself.</div>
+          </div>
+        `
+      },
+      {
+        id: "redactor",
+        code: "SEV–006",
+        title: `<span class="redact">████ ████████</span>`,
+        access: "public",
+        corrupted: true,
+        meta: "CLASSIFICATION: ▓▓▓▓▓▓▓▓ · INTEGRITY: 4%",
+        body: `
+          <p>Behind <span class="redact">the human failure at the end of</span> the Great Compact was <span class="redact">something considerably older</span> than any single act of betrayal. It is not <span class="redact">chaos</span>, and it is not <span class="redact">destruction</span>. It is, as far as this fragment can be trusted, <span class="redact">a force turned entirely against the act of working together</span>.</p>
+          <p>No source <span class="redact">anywhere in the public record</span> names it directly. What little survives suggests it does not hate <span class="redact">cities</span>, does not burn <span class="redact">archives</span>, does not kill <span class="redact">anyone outright</span>. It removes something quieter instead: <span class="redact">the thread between people who could have helped each other, and didn't</span>.</p>
+          <div class="tear-fragment">
+            "...arrives as a perfectly reasonable excuse not to help. Every committee ever formed to delay a decision rather than make one, every 'not my depart" <span class="corrupt">[ PAGE DAMAGED PAST THIS POINT ]</span>
+          </div>
+          <p class="corrupt">[ RECORD INTEGRITY: 4%. REMAINDER UNRECOVERABLE WITH TOOLS AVAILABLE AT THIS TERMINAL. ]</p>
+        `
+      }
+    ]
+  },
+  {
+    cat: "PEOPLES & RACES",
+    code: "PPL",
+    entries: [
+      {
+        id: "humans-present",
+        code: "PPL–001",
+        title: "Humans, Present Day",
+        access: "public",
+        meta: "CLASSIFICATION: GENERAL",
+        body: `
+          <p>Humans built the Great Compact and lost it. That single fact shapes almost every human institution left standing. Modern Cornerstone runs on ritual rather than reliable process: ceremonies, ledgers, oaths, titles, guild marks, and permits still exist, and are followed with real devotion, but they no longer reliably produce coordinated results. People perform the forms of organization without trusting that the forms will hold.</p>
+          <p>This produces a particular kind of human character: competent in isolation, suspicious in groups. A guild master can run their own hall with total confidence and still assume, correctly, that a rival guild will renege on any joint agreement the moment it becomes inconvenient. Ambition has not disappeared. What disappeared is the instinct that ambition can be pooled.</p>
+          <p>Into this, occasionally, someone arrives who still has the old instinct. They are treated with a strange mixture of relief and suspicion, since the last few people who promised to fix everything were usually selling something.</p>
+        `
+      },
+      {
+        id: "elves",
+        code: "PPL–002",
+        title: "The Elves",
+        access: "public",
+        meta: "CLASSIFICATION: GENERAL",
+        body: `
+          <p>Elven culture measures worth in permanence. A bridge, a treaty, a piece of music: none of it counts as finished until it has survived long enough to become inherited rather than merely made. This is why elven artisans were the natural counterpart to human coordination during the Compact: humans could organize an effort at a scale and speed elves found tedious, and elves could build something that would still matter after the humans who organized it were dead.</p>
+          <p>Since the exile, elven communities have largely withdrawn from continental affairs, maintaining the old Dominion at a careful distance. Elven testimony on the Severance treats it less as tragedy and more as confirmation: a people who could not keep faith with their own institutions were never going to keep faith with an alliance. This is not stated with malice. It is stated the way an engineer states a load-bearing failure.</p>
+          <p>There are early signs, unconfirmed by anything on file, that elven diplomatic interest in the continent is quietly reopening for the first time in centuries. No public record explains why now.</p>
+        `
+      },
+      {
+        id: "dwarves",
+        code: "PPL–003",
+        title: "The Dwarves",
+        access: "public",
+        meta: "CLASSIFICATION: GENERAL",
+        body: `
+          <p>Dwarven culture is built on the audit. Every agreement, shipment, and title is subject to periodic review, and a dwarf will describe this not as bureaucracy but as the only honest form of trust: you do not take someone's word, you take their record, and you check the record. This made dwarves ideal trade partners during the Compact and made the Severance, from their side, a straightforward finding rather than a betrayal. The charter house kept excellent records. It simply stopped honoring what the records said it owed.</p>
+          <p>Modern dwarven holds are almost entirely withdrawn into the mountains, running self-sufficient trade and engineering operations that route around Cornerstone rather than through it wherever possible. A dwarf willing to do business in the city proper is either desperate, unusually curious, or quietly auditing something. Dwarven contempt for human institutions is real but oddly impersonal: it reads less as anger than as a professional's disappointment in a partner who stopped doing the job properly.</p>
+        `
+      },
+      {
+        id: "orcs",
+        code: "PPL–004",
+        title: "The Orcs",
+        access: "public",
+        meta: "CLASSIFICATION: GENERAL, ACTIVE CONFLICT ON RECORD",
+        body: `
+          <p>Orcish clan structure survived the Severance more or less intact, in part because orcish coordination was never dependent on the Compact to begin with. What the Severance cost the clans was not capability but counterparty: the loss of a reliable human diplomatic partner turned what had been a managed, if tense, border relationship into a long slow erosion of orcish land through unmanaged human expansion.</p>
+          <p>Current record is explicit on this point and the terminal will not soften it: the present siege of Cornerstone is not the work of a supernatural enemy or an evil horde. It is a territorial claim over ancestral orcish land, pressed by force because centuries of unmanaged encroachment left no functioning diplomatic channel to press it through instead. Any account that frames this conflict as good against evil should be treated as human civic propaganda, not history.</p>
+          <p>Orcish clans value directness and follow-through, and hold humans in particular contempt for institutions that promise coordination and then fail to deliver it. This is, notably, the same complaint the dwarves have. The clans simply express it with less patience.</p>
+        `
+      },
+      {
+        id: "half-elves",
+        code: "PPL–005",
+        title: "Half-Elves and Other Liminal Peoples",
+        access: "public",
+        meta: "CLASSIFICATION: GENERAL",
+        body: `
+          <p>Anyone descended from more than one people inherits a specific difficulty: full belonging nowhere. Half-elves in particular occupy an unusual civic niche in Cornerstone, since elven withdrawal after the Severance left many of them raised entirely within human society, fluent in human institutions, and permanently regarded by both sides as slightly foreign.</p>
+          <p>This makes them disproportionately common among translators, archivists, and go-betweens; work that requires trust from two directions at once tends to fall to people who were never fully trusted by either. It also makes them useful, sometimes uncomfortably so, to anyone who needs a messenger who can move between worlds without officially representing either one.</p>
+          <p class="corrupt">[ RECORD GAP: several archive entries referencing named half-elven scholars have had their attribution fields struck, cause unrecorded. ]</p>
+        `
+      },
+      {
+        id: "giants",
+        code: "PPL–006",
+        title: "Giants",
+        access: "public",
+        meta: "CLASSIFICATION: GENERAL, RECORD SPARSE",
+        body: `
+          <p>What the archive holds on giants is thin, and what's here is mostly secondhand: highland travelers' accounts, a handful of trade-route warnings, the occasional boundary marker inscribed in a hand no living scholar can translate. Giants were never part of the Great Compact and never seem to have wanted to be. They kept, and by all available accounts still keep, to high country and old ruins well above where any of the Compact's three peoples settled.</p>
+          <p>Whether this scarcity reflects how little contact there ever was, or how much record of that contact simply didn't survive the Severance, is impossible to determine from what remains. The honest answer is that no one currently maintaining this archive knows, and the gap has been sitting unfilled long enough that most scholars have stopped noticing it as a gap at all.</p>
+          <p class="corrupt">[ RECORD GAP: cataloguing for this entry appears to have lapsed entirely in the decades following the Severance and was never resumed. ]</p>
+        `
+      },
+      {
+        id: "dragonkin",
+        code: "PPL–007",
+        title: "Dragonkin",
+        access: "public",
+        meta: "CLASSIFICATION: GENERAL, RECORD SPARSE",
+        body: `
+          <p>Even sparser than the giants' entry, and considerably harder to verify. What survives here consists almost entirely of folk tale and secondhand rumor rather than anything resembling a firsthand account, and the terminal will not pretend otherwise. Whether dragonkin are a people in their own right, descendants of the Great Wyrms said to have held dominion over this land in the deep past, or something the old tales have simply conflated over centuries of retelling, is not something any record on file can settle.</p>
+          <p>What little consistency exists across the scattered accounts suggests dragonkin, if they exist as described, keep themselves apart from the affairs of Cornerstone and its neighbors entirely, which would go a long way toward explaining why so little about them was ever written down to begin with.</p>
+          <p class="corrupt">[ RECORD GAP: no verified firsthand account on file. Attribution of this entry's scarcity to the Severance is the archive's best available guess, not a documented finding. ]</p>
+        `
+      }
+    ]
+  },
+  {
+    cat: "THE CROWN",
+    code: "CRN",
+    entries: [
+      {
+        id: "founding",
+        code: "CRN–001",
+        title: "Cornerstone: Founding and Foundation",
+        access: "public",
+        meta: "PERIOD: ~800 YRS AGO TO PRESENT · CLASSIFICATION: GENERAL",
+        body: `
+          <p>Cornerstone was founded at the convergence of three river valleys during the Age of the Great Compact, and its name was chosen deliberately: a cornerstone is the first piece set, the one every other piece measures itself against, the one nobody thinks about until it is missing. At founding, the name was aspirational rather than descriptive. The city was meant to be the foundation a coordinated civilization could build on indefinitely.</p>
+          <p>For roughly a century that held. Elven-built structures from this period still stand in the old quarter, outlasting nearly everything built after them. Dwarven engineering runs beneath the streets in drainage and supply systems that modern crews still do not fully understand. And human administration, at its peak, ran a city of three peoples smoothly enough that disputes were the exception rather than the rule.</p>
+          <p>The Severance did not destroy the city. It hollowed out what the city knew how to do. Cornerstone today is a place that still has all the physical infrastructure of a coordinated civilization and almost none of the institutional trust that originally made it work. It functions, but it functions the way a body functions after losing feeling in one hand: everything is still attached, and almost nothing responds the way it should on the first try.</p>
+        `
+      },
+      {
+        id: "compact-of-guilds",
+        code: "CRN–002",
+        title: "The Compact of Guilds and the First Guild War",
+        access: "public",
+        meta: "PERIOD: ~400 YRS AGO · CLASSIFICATION: GENERAL",
+        body: `
+          <p>Three centuries after the Severance, Cornerstone made its first serious attempt at rebuilding coordinated governance. Five guild masters, representing the city's dominant trades at the time, signed the Compact of Guilds: a shared framework for trade rules, dispute resolution, and joint civic investment.</p>
+          <p>It worked, for sixty years. That is longer than most modern citizens expect when they hear the story for the first time, and that detail matters: the Compact of Guilds was not a naive failure. It was a genuine, functioning system that eventually collapsed anyway, into what the histories call the First Guild War, a period of internal guild conflict severe enough that the fifth founding guild does not exist in any form today. No one on record agrees on which broke faith first.</p>
+          <p>This is the single most important piece of civic memory in Cornerstone, and it is rarely stated outright because it does not need to be. Every guild master who has proposed a new joint framework since has been met with the same unspoken question: what makes this attempt different from the one that already failed. Most proposals do not survive contact with that question.</p>
+        `
+      },
+      {
+        id: "kings-ascension",
+        code: "CRN–003",
+        title: "The Unbroken Throne",
+        access: "public",
+        meta: "PERIOD: ~700 YRS AGO TO PRESENT · CLASSIFICATION: GENERAL",
+        body: `
+          <p>Cornerstone's monarchy is, by a wide margin, the oldest continuous institution to survive the Severance. Every guild has reorganized, collapsed, merged, or renamed itself at least once since then. The throne has not. The current king is simply the latest name in a line that traces back, unbroken by any record on file, to before the Great Compact fell.</p>
+          <p>This is usually presented as strength. It is worth noting plainly that it is not the same thing as competence. The crown's claim to rule has never rested on demonstrated coordination ability, the way guild leadership at least nominally does. It rests on blood, ritual, and a doctrine the royal house has maintained since before living memory: that the right to rule Cornerstone was granted by divine sanction to the founding line, and passes by inheritance alone, regardless of the abilities of whoever happens to be born into it next.</p>
+          <p>Because that claim never had to be earned, it was never really tested by the Severance the way everything else was. A king does not need the capacity for organized effort to hold a throne by birthright. He only needs enough ceremony, enough soldiers, and enough of a population too fractured to coordinate a better alternative. All three have been available, in slowly diminishing supply, for seven hundred years.</p>
+          <p>The decline has been gradual enough that no single generation experienced it as collapse. Each king has, on average, governed a little less capably than the one before, presided over a little less real authority, and leaned a little more heavily on ceremony to disguise how little of the old function remains. The current ruler did not create this condition. He inherited it, the way every king before him inherited it from someone who inherited it from someone else, all the way back to a founding claim nobody alive can verify and nobody organized enough has yet managed to challenge.</p>
+          <p class="corrupt">[ RECORD GAP: the reigning king's personal name field was struck from this terminal during a security review after the siege began. Title only remains on public record. ]</p>
+        `
+      }
+    ]
+  },
+  {
+    cat: "THE GUILDS",
+    code: "GLD",
+    entries: [
+      {
+        id: "craftsmens-guild",
+        code: "GLD–001",
+        title: "The Craftsmen's Guild",
+        access: "public",
+        meta: "KNOWN AS: THE BUILDERS · CLASSIFICATION: GENERAL",
+        body: `
+          <p>The Craftsmen's Guild governs Cornerstone's skilled trades: construction, smithing, masonry, and the artisan work that keeps a city standing rather than merely occupied. Of the surviving guilds, the Craftsmen enjoy the widest public goodwill. Their work is visible, their disputes are usually practical rather than political, and a bad Craftsmen's guildmaster tends to be replaced quickly because shoddy work is difficult to hide.</p>
+          <p>The current guildmaster is a figure widely respected for decades of steady leadership. Public sentiment holds the Craftsmen's Guild as trustworthy and pragmatic, more interested in getting things built than in playing the city's longer political games.</p>
+          <p>A working minority within the guild specializes in salvage and repair of old-Compact devices: resonance locks, load-bearing wards, the odd relay-fragment pulled from a collapsed tower. None of it is well understood. All of it still sells, because a salvaged pre-Compact mechanism reliably outperforms anything built new, and nobody currently living knows how to make more of it.</p>
+          <div class="fragment">
+            "Ask a Craftsman what they think of the Merchants' Guild and they'll tell you a joke. Ask them what they think of a job done badly and watch the joke stop."
+            <span class="src">SOURCE: attributed, unverified, common civic saying</span>
+          </div>
+        `
+      },
+      {
+        id: "merchants-guild",
+        code: "GLD–002",
+        title: "The Merchants' Guild",
+        access: "public",
+        meta: "KNOWN AS: THE PRAGMATISTS · CLASSIFICATION: GENERAL",
+        body: `
+          <p>The Merchants' Guild controls trade, supply chains, moneylending, and a considerable share of the city's information flow. They are, by reputation and by their own admission, the most flexible and transactional of Cornerstone's guilds, and the most comfortable operating in conditions everyone else finds unstable.</p>
+          <p>The current guildmaster is widely regarded as reasonable, likable, and easy to negotiate with, someone who avoids public confrontation and prefers to resolve disputes through private arrangement rather than open dispute. This reputation is, as far as the public record is concerned, entirely earned.</p>
+        `
+      },
+      {
+        id: "scholars-guild",
+        code: "GLD–003",
+        title: "The Scholars' Guild",
+        access: "public",
+        meta: "KNOWN AS: THE GATE-KEEPERS · CLASSIFICATION: GENERAL",
+        body: `
+          <p>The Scholars' Guild holds knowledge, arcane research, and formal education, and maintains a near-monopoly on literacy across large portions of Cornerstone. For a thousand years their authority has rested on a simple fact: they are the only people in the room who can reliably analyze a complex problem. Nobody questions the fee for that service, because there has rarely been an alternative.</p>
+          <p>Publicly, the Scholars' Guild presents as cooperative, careful, and civic-minded, quick to offer counsel and slow to take sides in any dispute that does not directly concern them.</p>
+        `
+      },
+      {
+        id: "soldiers-guild",
+        code: "GLD–004",
+        title: "The Soldiers' Guild",
+        access: "public",
+        meta: "KNOWN AS: THE BLUNT INSTRUMENT · CLASSIFICATION: GENERAL",
+        body: `
+          <p>The Soldiers' Guild provides security, protection, and enforcement, and functions as the closest thing Cornerstone has had to a police force for the better part of a thousand years. They know this, and their fees reflect it.</p>
+          <p>The guild is generally comfortable with the current state of affairs and skeptical of anything that changes how disputes get resolved in the city. Problems that cannot be solved with a show of force tend to make them uneasy, less because they lack the intelligence to understand such problems and more because those problems fall outside the tools they have spent generations mastering.</p>
+        `
+      }
+    ]
+  }
+];
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const navTree = document.getElementById('navTree');
+const main = document.getElementById('main');
+const searchBox = document.getElementById('searchBox');
+let allEntries = [];
+
+DATA.forEach(cat=>{
+  const catEl = document.createElement('div');
+  catEl.className = 'cat';
+  const activeCount = cat.entries.filter(e=>e.access!=='stub').length;
+  catEl.innerHTML = `<div class="cat-head"><span>${cat.cat}</span><span class="count">${activeCount}</span></div>`;
+  cat.entries.forEach(entry=>{
+    entry._cat = cat.cat;
+    allEntries.push(entry);
+    const row = document.createElement('div');
+    if(entry.access==='stub'){
+      row.className = 'entry stub';
+      row.innerHTML = `<span class="code">${entry.code}</span><span>${entry.title}</span>`;
+    } else {
+      row.className = 'entry';
+      row.innerHTML = `<span class="code">${entry.code}</span><span>${entry.title}</span>`;
+      row.addEventListener('click', ()=> selectEntry(entry.id));
+      row.dataset.id = entry.id;
+    }
+    catEl.appendChild(row);
+  });
+  navTree.appendChild(catEl);
+});
+
+function renderRecord(entry){
+  const corruptedClass = entry.corrupted ? ' corrupted' : '';
+  main.innerHTML = `
+    <div class="record${corruptedClass}">
+      <div class="rec-head">
+        <div>
+          <div class="rec-code">${entry.code}</div>
+          <div class="rec-title">${entry.title}</div>
+        </div>
+        <div class="rec-meta">${entry.meta || ''}</div>
+      </div>
+      <div class="rec-body">${entry.body}</div>
+      <div class="footer-strip">
+        <span>CATEGORY: ${entry._cat}</span>
+        <span>END OF RECORD ${entry.code}</span>
+      </div>
+    </div>
+  `;
+  main.scrollTop = 0;
+}
+
+function selectEntry(id){
+  const entry = allEntries.find(e=>e.id===id);
+  if(!entry) return;
+  document.querySelectorAll('.entry').forEach(el=>el.classList.remove('active'));
+  const el = document.querySelector(`.entry[data-id="${id}"]`);
+  if(el) el.classList.add('active');
+  renderRecord(entry);
+}
+
+searchBox.addEventListener('input', (e)=>{
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.entry:not(.stub)').forEach(el=>{
+    const id = el.dataset.id;
+    const entry = allEntries.find(en=>en.id===id);
+    const haystack = (entry.title + ' ' + (entry.body||'')).toLowerCase();
+    el.style.display = (q==='' || haystack.includes(q)) ? '' : 'none';
+  });
+});
+
+/* default view */
+selectEntry('welcome');
+</script>
+</body>
+</html>

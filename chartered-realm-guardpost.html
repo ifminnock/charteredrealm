@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Guard Post — Third District Notice Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Vollkorn:ital,wght@0,400;0,500;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* shell / stone wall */
+  --stone:#3d4043;
+  --stone-edge:#26282a;
+
+  /* board / parchment surface */
+  --board:#5c5347;
+  --parchment:#d9d3c3;
+  --parchment-shadow:#c5bea9;
+  --parchment-deep:#b4ad96;
+
+  /* ink */
+  --ink:#242320;
+  --ink-muted:#57534a;
+  --ink-faint:#847e70;
+
+  /* functional accents */
+  --iron:#565e63;
+  --iron-bright:#71797f;
+  --seal:#7c2020;
+  --seal-bright:#9c2e2e;
+
+  /* structure */
+  --line:#8d8776;
+  --line-soft:#a49d89;
+
+  --font-stamp:'Rye', 'Courier New', serif;
+  --font-read:'Vollkorn', Georgia, serif;
+  --font-mono:'Courier Prime', 'Courier New', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--stone-edge);
+  font-family:var(--font-read);
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+.post{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:
+    radial-gradient(ellipse at 50% 0%, #4a4d50 0%, var(--stone) 55%, var(--stone-edge) 100%);
+}
+.wall-label{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.12em;
+  color:#9aa0a3;
+  text-align:center;
+  padding:10px 14px 5px;
+  text-transform:uppercase;
+}
+.board-frame{
+  position:relative;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  margin:0 10px 10px;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:
+    inset 0 0 0 4px #3a3226,
+    inset 0 0 0 5px #1f1a14,
+    0 8px 24px rgba(0,0,0,0.6);
+  background:var(--board);
+}
+.board-frame::before{
+  /* wood grain */
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:60;
+  opacity:0.5;
+  background:
+    repeating-linear-gradient(4deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 9px);
+  mix-blend-mode:multiply;
+}
+
+/* ===== TORCH STATUS STRIP ===== */
+.torch-bar{
+  background:var(--ink);
+  color:#c9c2ab;
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.torch-left{display:flex;align-items:center;gap:7px;}
+.flame{
+  width:6px;height:9px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  background:#c9862f;
+  box-shadow:0 0 5px 1px rgba(201,134,47,0.7);
+  animation:flicker 2.4s infinite ease-in-out;
+  flex-shrink:0;
+}
+@keyframes flicker{
+  0%,100%{opacity:1; transform:scaleY(1);}
+  30%{opacity:0.7; transform:scaleY(0.9) translateX(0.5px);}
+  55%{opacity:0.9; transform:scaleY(1.06);}
+  80%{opacity:0.55; transform:scaleY(0.82) translateX(-0.5px);}
+}
+.torch-right{color:#847e70;font-size:9px;}
+
+/* ===== CATEGORY NAV ===== */
+.cat-nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:11px 10px;
+  background:#4a463b;
+  border-bottom:1px solid #2c2820;
+  flex-shrink:0;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+  z-index:2;
+}
+.cat-nav::-webkit-scrollbar{display:none;}
+.cat-pill{
+  flex-shrink:0;
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:#c9c2ab;
+  background:rgba(0,0,0,0.2);
+  border:1px solid #2c2820;
+  border-radius:1px;
+  padding:8px 11px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.cat-pill.active{
+  background:var(--iron);
+  color:#eee9dc;
+  border-color:var(--iron-bright);
+}
+
+/* ===== BOARD CONTENT ===== */
+.board{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:18px 14px 44px;
+  position:relative;
+  z-index:2;
+  min-height:0;
+}
+.board::-webkit-scrollbar{width:5px;}
+.board::-webkit-scrollbar-thumb{background:#2c2820; border-radius:3px;}
+
+.cat-heading{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:#c9c2ab;
+  margin:2px 2px 14px;
+}
+
+/* ===== PROCLAMATION ENTRY ===== */
+.notice{
+  background:var(--parchment);
+  border:1px solid var(--line);
+  border-radius:1px;
+  padding:18px 18px 16px;
+  margin-bottom:16px;
+  position:relative;
+  box-shadow:0 3px 8px rgba(0,0,0,0.35);
+}
+.notice::before{
+  /* nail */
+  content:"";
+  position:absolute;
+  top:9px; left:50%;
+  transform:translateX(-50%);
+  width:8px; height:8px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #8a8478, #423e34 70%);
+  box-shadow:0 1px 2px rgba(0,0,0,0.5);
+}
+.notice-eyebrow{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin:8px 0 4px;
+}
+.notice h3{
+  font-family:var(--font-stamp);
+  font-size:19px;
+  font-weight:400;
+  letter-spacing:0.02em;
+  margin:0 0 10px;
+  line-height:1.25;
+  border-bottom:1px solid var(--line);
+  padding-bottom:9px;
+}
+.notice p{
+  font-size:15.5px;
+  line-height:1.72;
+  margin:0 0 11px;
+}
+.notice p:last-child{margin-bottom:0;}
+.notice-meta{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.06em;
+  color:var(--ink-faint);
+  text-transform:uppercase;
+  margin-top:10px;
+  border-top:1px solid var(--line-soft);
+  padding-top:8px;
+}
+
+/* ===== WANTED POSTER ===== */
+.poster{
+  background:var(--parchment);
+  border:2px solid var(--ink);
+  border-radius:1px;
+  padding:0;
+  margin-bottom:18px;
+  position:relative;
+  box-shadow:0 4px 10px rgba(0,0,0,0.4);
+  transform:rotate(-0.4deg);
+}
+.poster:nth-child(even){transform:rotate(0.5deg);}
+.poster::before{
+  content:"";
+  position:absolute;
+  top:-5px; left:14px;
+  width:9px; height:9px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #8a8478, #423e34 70%);
+  box-shadow:0 1px 2px rgba(0,0,0,0.5), 3px 4px 0 rgba(0,0,0,0.15);
+  z-index:2;
+}
+.poster::after{
+  content:"";
+  position:absolute;
+  top:-5px; right:16px;
+  width:9px; height:9px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #8a8478, #423e34 70%);
+  box-shadow:0 1px 2px rgba(0,0,0,0.5);
+  z-index:2;
+}
+.poster-inner{padding:16px 17px 15px;}
+.poster-stamp{
+  font-family:var(--font-stamp);
+  font-size:26px;
+  text-align:center;
+  color:var(--seal);
+  letter-spacing:0.06em;
+  line-height:1;
+  margin-bottom:8px;
+  text-shadow:1px 1px 0 rgba(0,0,0,0.08);
+}
+.poster h3{
+  font-family:var(--font-read);
+  font-weight:600;
+  font-style:italic;
+  font-size:16.5px;
+  text-align:center;
+  margin:0 0 12px;
+  color:var(--ink);
+  border-bottom:1px solid var(--line);
+  padding-bottom:10px;
+}
+.poster p{
+  font-size:15px;
+  line-height:1.7;
+  margin:0 0 10px;
+}
+.poster p:last-of-type{margin-bottom:0;}
+.reward{
+  text-align:center;
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  background:var(--parchment-deep);
+  border-top:1px dashed var(--ink-faint);
+  border-bottom:1px dashed var(--ink-faint);
+  padding:8px 0;
+  margin:12px 0;
+}
+.charge-line{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--seal);
+  margin-bottom:10px;
+}
+.poster-meta{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.05em;
+  color:var(--ink-faint);
+  text-transform:uppercase;
+  text-align:center;
+  margin-top:8px;
+}
+.poster.flagship{
+  border-color:var(--seal);
+  border-width:2px;
+}
+.poster.flagship .poster-stamp{font-size:29px;}
+
+/* ===== RESTRICTED / GATE ===== */
+.gate{
+  border:2px dashed var(--seal);
+  background:rgba(124,32,32,0.06);
+  text-align:center;
+  padding:22px 16px;
+  margin-bottom:16px;
+  border-radius:1px;
+}
+.gate-glyph{
+  font-size:20px;
+  color:var(--seal);
+  margin-bottom:8px;
+  display:block;
+}
+.gate p{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--seal);
+  margin:0 0 14px;
+  line-height:1.6;
+}
+.gate button{
+  background:var(--seal);
+  color:var(--parchment);
+  border:none;
+  padding:10px 18px;
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:10.5px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  border-radius:1px;
+}
+.gate button:active{background:var(--seal-bright);}
+
+.restricted-content{
+  border:2px solid var(--seal);
+  background:#e3d9c0;
+  border-radius:1px;
+  padding:18px 18px 16px;
+  margin-bottom:16px;
+}
+.restricted-content .notice-eyebrow{color:var(--seal);}
+.restricted-content h3{font-family:var(--font-stamp); font-size:18px; font-weight:400;}
+.restricted-content p{font-size:15px; line-height:1.7; margin:0 0 11px;}
+
+@media (max-width:380px){
+  .poster-stamp{font-size:22px;}
+  .notice h3{font-size:17px;}
+}
+</style>
+</head>
+<body>
+<a href="chartered-realm-map.html" style="position:fixed;top:8px;left:8px;z-index:999;background:rgba(0,0,0,0.6);color:#ecdfc0;font-family:monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:3px;text-decoration:none;border:1px solid rgba(255,255,255,0.25);">&#8592; Map</a>
+
+<div class="post">
+  <div class="wall-label">GUARD POST · THIRD DISTRICT WATCH · NOTICE BOARD</div>
+
+  <div class="board-frame">
+    <div class="torch-bar">
+      <div class="torch-left">
+        <span class="flame"></span>
+        <span>BOARD LAST CLEARED: UNKNOWN</span>
+      </div>
+      <div class="torch-right" id="torchRight">PROCLAMATIONS</div>
+    </div>
+
+    <div class="cat-nav" id="catNav"></div>
+
+    <div class="board" id="board"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {
+    cat:"PROCLAMATIONS",
+    code:"ORD",
+    entries:[
+      {
+        id:"assembly-ordinance",
+        code:"ORD–014",
+        title:"Ordinance on Coordinated Activity and Public Assembly",
+        meta:"BY ORDER OF THE CHANCELLERY · IN FORCE",
+        body:`
+          <p>Let it be posted plainly, as it has been posted every season for longer than any current officer of this Watch has served: the organizing of labor, resources, or persons in any number greater than five, for any purpose, requires a Registered Coordinator's seal, obtainable from the appropriate guild hall upon payment of the standing fee and completion of the standing inspection.</p>
+          <p>This is not, whatever the wall-preachers claim, a ban on planning. The Crown does not outlaw thinking ahead. It requires that thinking ahead be done by someone accountable, in the open, with a name attached to the outcome. Unlicensed coordination is not punished for existing. It is punished for what it has, with some regularity, been allowed to become.</p>
+          <p class="notice-meta">Violation: fine not exceeding two crowns for a first offense. See ORD–015 for offenses resulting in property damage, injury, or public disorder.</p>
+        `
+      },
+      {
+        id:"disorder-ordinance",
+        code:"ORD–015",
+        title:"Ordinance on Coordination Resulting in Public Disorder",
+        meta:"BY ORDER OF THE CHANCELLERY · IN FORCE",
+        body:`
+          <p>Where an unlicensed coordinated effort results in property damage, bodily injury, or disruption of trade lasting longer than one day, the offense is elevated from a fine to detainment, term to be set by the presiding magistrate. This office would like to note, for any citizen inclined to test the difference, that this ordinance is invoked with considerably more regularity than ORD–014, and for reasons the Watch finds entirely unsurprising.</p>
+          <p>Organizing five neighbors to share a well rota is not, on its own, a crime. Organizing five neighbors to share a well rota so badly that the well collapses is. The Chancellery has found, across some three hundred years of enforcement, that the second outcome follows the first with dispiriting frequency.</p>
+        `
+      },
+      {
+        id:"why-it-matters",
+        code:"ORD–002",
+        title:"On the Reason for This Office's Vigilance",
+        meta:"POSTED NOTICE · CLASSIFICATION: GENERAL",
+        body:`
+          <p>Newer officers are sometimes asked by citizens why the Watch takes an interest in something as small as an unlicensed grain rota or a self-appointed foreman. The honest answer, seldom given aloud but printed here because it should be: it is not really about the grain, or the foreman.</p>
+          <p>Seven hundred years ago, the capacity for organized effort was lost to every human in the Realm on the same night, all at once, and no one who studies the Severance has ever produced a satisfying account of why. In the absence of an answer, this Watch has inherited a standing, half-superstitious caution: large coordinated efforts, run by unaccountable hands, are watched closely, not because the law believes they will summon anything, but because this office has never been able to prove they won't.</p>
+        `
+      }
+    ]
+  },
+  {
+    cat:"WANTED",
+    code:"WNT",
+    entries:[
+      {
+        id:"flagship",
+        type:"poster",
+        flagship:true,
+        code:"WNT–041",
+        stamp:"WANTED",
+        title:"For Unlicensed Coordination, Effectively Performed",
+        charge:"SUSPICION OF ORGANIZING WITHOUT LICENSE, WITHOUT INCIDENT",
+        reward:"REWARD: FORTY CROWNS, PAID DISCREETLY",
+        body:`
+          <p>Persons unknown, number uncertain, are wanted in connection with the sudden and unauthorized reorganization of relief efforts during the recent granary shortfall in the Fourth Ward. Distribution lines that had failed for three days under official management were running smoothly within the hour of these persons' involvement. No permit was sought. No guild seal was affixed. No one was hurt, nothing was damaged, and not a single loaf went unaccounted for.</p>
+          <p>This office wishes to be direct about why this warrant carries a reward well above the standing rate for an unlicensed-coordination fine: it is not the disorder that concerns the Chancellery here. It is the absence of it. Whoever did this did not fumble it the way such efforts nearly always do. This Watch would very much like to know how, and on whose authority, and why.</p>
+        `,
+        marginal:"Filed personally by the district captain, against usual practice for a fine-tier offense. Make of that what you will."
+      },
+      {
+        id:"foreman",
+        type:"poster",
+        code:"WNT–033",
+        stamp:"WANTED",
+        title:"The Would-Be Foreman of Cutter's Row",
+        charge:"UNLICENSED COORDINATION, PUBLIC ENDANGERMENT",
+        reward:"REWARD: THREE CROWNS",
+        body:`
+          <p>Sought in connection with the scaffold collapse at Cutter's Row. Witnesses agree the accused had appointed themselves foreman of a joint construction effort between two work crews who had never before taken instruction from the same hand, and had drawn up three separate schedules that were, by all accounts, mutually contradictory.</p>
+          <p>No permit was sought. No one asked whether one was needed. The scaffold came down before either schedule was completed. Miraculously, no one was standing beneath it at the time.</p>
+        `
+      },
+      {
+        id:"convener",
+        type:"poster",
+        code:"WNT–029",
+        stamp:"WANTED",
+        title:"The Unlicensed Convener of Miller's Court",
+        charge:"UNLICENSED COORDINATION RESULTING IN DISORDER",
+        reward:"REWARD: TWO CROWNS",
+        body:`
+          <p>Sought for organizing a grain-pooling arrangement among five households without seeking the required seal. The arrangement held for eleven days before collapsing over an unresolved dispute regarding distribution, at which point it was discovered that no one, including the organizer, had actually agreed on who was owed what.</p>
+          <p>The resulting disturbance required four officers to disperse and cost one apothecary his front window. The accused has not been seen since.</p>
+        `
+      },
+      {
+        id:"rescheduler",
+        type:"poster",
+        code:"WNT–012",
+        stamp:"CITED",
+        title:"The Chronic Rescheduler of the Weavers' Green",
+        charge:"PUBLIC NUISANCE, REPEAT OFFENSE",
+        reward:"FINE: FOUR SILVER, OUTSTANDING",
+        body:`
+          <p>This individual is, notably, not wanted for unlicensed coordination. This office has confirmed the accused holds a valid Registered Coordinator's seal, obtained honestly, three years running.</p>
+          <p>The citation instead concerns eleven consecutive meetings called to determine the agenda for a twelfth meeting, occupying the public benches of the Weavers' Green for the better part of a month and preventing their ordinary use by actual weavers. The seal permits coordination. It does not, this office would like to clarify for the record, compel anyone to attend a meeting about a meeting.</p>
+        `
+      },
+      {
+        id:"oathbreaker",
+        type:"poster",
+        code:"WNT–007",
+        stamp:"WANTED",
+        title:"For Oath-Breaking Against the Stonecutters' Guild",
+        charge:"GUILD TREASON, HIGH CHARGE",
+        reward:"REWARD: TWENTY-FIVE CROWNS",
+        body:`
+          <p>Wanted for selling the Stonecutters' apprenticeship methods, sworn to secrecy under formal oath, to a rival guild in a neighboring district. The apprentice in question is not accused of unlicensed coordination. Their crime is older and, by the standing of this warrant, considerably worse.</p>
+          <p>This office is required to note, as it is required to note on every oath-breaking warrant regardless of the guild involved, that Guild Treason carries the highest standing reward of any non-capital offense on the books. Cornerstone has never been gentle with broken oaths. It has had seven hundred years of practice being unforgiving about exactly this.</p>
+        `
+      },
+      {
+        id:"charter-breach",
+        type:"poster",
+        code:"WNT–003",
+        stamp:"WANTED",
+        title:"For Breach of a Sworn Charter",
+        charge:"BREACH OF CHARTER, HIGH CHARGE",
+        reward:"REWARD: THIRTY CROWNS",
+        body:`
+          <p>Wanted in connection with the ruin of the Fennimore trading concern, following the accused's failure to honor terms sworn under a formal Charter before three witnesses and a notary's seal. The concern's creditors were left with nothing. The accused was last seen leaving the district by the north road.</p>
+          <p>This office will not pretend to a philosophy it does not hold, but will observe what every citizen of Cornerstone already half believes: a charter is meant to be the one promise a person cannot quietly walk away from. Whoever wrote that belief into custom did more good for this city than most laws this office is asked to enforce.</p>
+        `
+      }
+    ]
+  },
+  {
+    cat:"RESTRICTED",
+    code:"RST",
+    entries:[
+      {
+        id:"founders-well",
+        type:"gated",
+        code:"RST–002",
+        title:"Case File: The Incident at Founder's Well",
+        gateText:"SEALED BY ORDER OF THE CHANCELLERY · BREAK SEAL TO READ",
+        body:`
+          <p>Forty-one years ago, an unlicensed effort to reinforce the failing wall of Founder's Well drew some sixty volunteers, organized informally and in haste after the standing repair guild declared the work too costly to prioritize. The wall held for three days under the volunteers' work, longer than the guild's own estimate, before a miscommunication between two shifts left a support beam unmanned at the critical hour. The wall came down. Eleven people did not come up from the lower cistern in time.</p>
+          <p>This is the incident this office's officers are required to study before their first posting, and the reason ORD–014 and ORD–015 are enforced with more diligence than their plain wording might suggest to a visitor. The Chancellery's position, recorded here without softening: the volunteers at Founder's Well were not incompetent, or careless, or ill-meaning. They were simply doing something none of them had been trained to do, at a scale none of them had practice managing, with no one accountable for the seams between their good intentions. This office has chosen, rightly or not, to legislate against the seams rather than the intentions.</p>
+        `
+      },
+      {
+        id:"old-compact-devices",
+        type:"gated",
+        code:"RST–005",
+        title:"Standing Order Regarding Devices of Old-Compact Manufacture",
+        gateText:"SEALED BY ORDER OF THE CHANCELLERY · BREAK SEAL TO READ",
+        body:`
+          <p>Any citizen who discovers a device, tower, fragment, or mechanism believed to date from the Age of the Great Compact, and bearing the resonance-cut craftsmanship associated with the old Concord Chain, is required by standing order to report the discovery to the nearest Watch post within one day. Unreported possession of such an item is itself an offense, regardless of whether the item is functional.</p>
+          <p>This office is not in a position to explain the reasoning behind this order beyond what is written here: three attempts on record to privately relight recovered relay fragments, over the past century, ended in the reporting party's death, disappearance, or a confession too incoherent for the presiding magistrate to record as testimony. The Chancellery does not currently believe the old Chain can be safely restarted by private hands. This office has been instructed to enforce that belief whether or not it is correct.</p>
+        `
+      }
+    ]
+  }
+];
+
+let activeCat = DATA[0].cat;
+
+function renderNav(){
+  const nav = document.getElementById('catNav');
+  nav.innerHTML = DATA.map(c =>
+    `<div class="cat-pill ${c.cat===activeCat?'active':''}" data-cat="${c.cat}">${c.cat}</div>`
+  ).join('');
+  nav.querySelectorAll('.cat-pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      activeCat = p.dataset.cat;
+      renderNav();
+      renderBoard();
+      document.getElementById('board').scrollTop = 0;
+    });
+  });
+}
+
+function renderBoard(){
+  const board = document.getElementById('board');
+  const cat = DATA.find(c=>c.cat===activeCat);
+  document.getElementById('torchRight').textContent = cat.cat;
+
+  let html = `<div class="cat-heading">${cat.cat}</div>`;
+
+  cat.entries.forEach(e=>{
+    if(e.type === 'poster'){
+      html += `
+        <div class="poster ${e.flagship?'flagship':''}">
+          <div class="poster-inner">
+            <div class="poster-stamp">${e.stamp}</div>
+            <h3>${e.title}</h3>
+            <div class="charge-line">${e.charge}</div>
+            ${e.body}
+            <div class="reward">${e.reward}</div>
+            ${e.marginal ? `<p style="font-style:italic;font-size:13.5px;color:var(--ink-muted);margin-bottom:0;">${e.marginal}</p>` : ''}
+            <div class="poster-meta">${e.code}</div>
+          </div>
+        </div>
+      `;
+    } else if(e.type === 'gated'){
+      html += `
+        <div class="gate" data-id="${e.id}">
+          <span class="gate-glyph">✦</span>
+          <p>${e.gateText}</p>
+          <button data-reveal="${e.id}">Break the Seal</button>
+        </div>
+        <div class="restricted-content" data-id="${e.id}" style="display:none;">
+          <div class="notice-eyebrow">${e.code} · RESTRICTED</div>
+          <h3>${e.title}</h3>
+          ${e.body}
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="notice">
+          <div class="notice-eyebrow">${e.code}</div>
+          <h3>${e.title}</h3>
+          ${e.body}
+          <div class="notice-meta">${e.meta}</div>
+        </div>
+      `;
+    }
+  });
+
+  board.innerHTML = html;
+
+  board.querySelectorAll('[data-reveal]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.reveal;
+      board.querySelector(`.gate[data-id="${id}"]`).style.display = 'none';
+      board.querySelector(`.restricted-content[data-id="${id}"]`).style.display = 'block';
+    });
+  });
+}
+
+renderNav();
+renderBoard();
+</script>
+</body>
+</html>

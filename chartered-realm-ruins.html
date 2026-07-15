@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Ruin on the Old Road</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Metamorphous&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dusk:#20241f;
+  --dusk-edge:#12140f;
+
+  --stone:#8b8f7c;
+  --stone-shadow:#75786a;
+  --stone-deep:#63665a;
+
+  --ink:#232620;
+  --ink-muted:#54574a;
+  --ink-faint:#82836f;
+
+  --lichen:#63744a;
+  --lichen-bright:#7d9260;
+
+  --line:#9a9c85;
+  --line-soft:#adae97;
+
+  --font-carved:'Metamorphous', 'Times New Roman', serif;
+  --font-read:'Crimson Text', Georgia, serif;
+  --font-mono:'Fira Mono', 'Courier New', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--dusk-edge);
+  font-family:var(--font-read);
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+.site{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(ellipse at 50% 0%, #2c3128 0%, var(--dusk) 55%, var(--dusk-edge) 100%);
+}
+.site-label{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.12em;
+  color:#8a9276;
+  text-align:center;
+  padding:10px 14px 5px;
+  text-transform:uppercase;
+}
+
+.frame{
+  position:relative;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  margin:0 10px 10px;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px #0e100c, inset 0 0 50px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.6);
+  background:var(--stone);
+}
+.frame::before{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:50;
+  opacity:0.4;
+  background:repeating-linear-gradient(100deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 4px);
+  mix-blend-mode:multiply;
+}
+
+.status-bar{
+  background:var(--ink);
+  color:#c7cbb8;
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.status-left{display:flex;align-items:center;gap:7px;}
+.dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--lichen-bright);
+  animation:pulse 3.5s infinite ease-in-out;
+  flex-shrink:0;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.status-right{color:#7f8270;font-size:9px;}
+
+.nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:11px 10px;
+  background:var(--stone-deep);
+  border-bottom:1px solid #454838;
+  flex-shrink:0;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+  z-index:2;
+}
+.nav::-webkit-scrollbar{display:none;}
+.nav-pill{
+  flex-shrink:0;
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:#d4d6c3;
+  background:rgba(0,0,0,0.2);
+  border:1px solid #454838;
+  border-radius:1px;
+  padding:8px 11px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.nav-pill.active{background:var(--lichen); color:#eef1e2; border-color:var(--lichen-bright);}
+
+.page{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:20px 18px 44px;
+  position:relative;
+  z-index:2;
+  min-height:0;
+}
+.page::-webkit-scrollbar{width:5px;}
+.page::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px;}
+
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--lichen);
+  margin:0 0 6px;
+}
+h1.site-title{
+  font-family:var(--font-carved);
+  font-size:22px;
+  font-weight:400;
+  margin:0 0 14px;
+  line-height:1.3;
+  border-bottom:2px solid var(--line);
+  padding-bottom:11px;
+  color:var(--ink);
+}
+p{
+  font-size:16.5px;
+  line-height:1.78;
+  margin:0 0 14px;
+  max-width:66ch;
+}
+
+.divider{
+  text-align:center;
+  color:var(--lichen);
+  font-size:13px;
+  letter-spacing:0.4em;
+  margin:20px 0;
+  opacity:0.6;
+}
+
+/* ===== RUBBING PANEL ===== */
+.rubbing{
+  border:1px solid var(--line);
+  border-radius:1px;
+  margin:16px 0 20px;
+  overflow:hidden;
+  background:var(--stone-deep);
+}
+.rubbing-label{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#c7cbb8;
+  padding:9px 14px;
+  background:var(--ink);
+}
+.rubbing-surface{
+  position:relative;
+  min-height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:20px;
+}
+.rubbing-surface.unrubbed{
+  background:
+    repeating-linear-gradient(115deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 2px, transparent 2px, transparent 5px),
+    var(--stone);
+}
+.rubbing-prompt{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  text-align:center;
+}
+.rubbing-prompt span{
+  display:block;
+  margin-top:8px;
+  color:var(--lichen);
+  font-weight:600;
+}
+.rubbing-revealed{
+  display:none;
+  padding:18px 18px 16px;
+  background:#e4e1cf;
+}
+.rubbing-revealed.shown{display:block;}
+.rubbing-revealed h4{
+  font-family:var(--font-carved);
+  font-size:16px;
+  font-weight:400;
+  margin:0 0 10px;
+  color:var(--ink);
+}
+.rubbing-revealed p{
+  font-size:15.5px;
+  line-height:1.72;
+  color:var(--ink);
+}
+.field-note{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px dashed var(--ink-faint);
+  font-size:13.5px;
+  line-height:1.65;
+  font-style:italic;
+  color:var(--ink-muted);
+}
+.field-note-label{
+  display:block;
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  font-style:normal;
+  margin-bottom:4px;
+}
+
+/* ===== THE PRISTINE WARNING ===== */
+.warning-block{
+  border:2px solid var(--ink);
+  background:#e9e6d6;
+  padding:20px 20px 18px;
+  margin:18px 0;
+  position:relative;
+}
+.warning-eyebrow{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:10px;
+}
+.warning-block h4{
+  font-family:var(--font-carved);
+  font-size:17px;
+  font-weight:400;
+  margin:0 0 12px;
+  color:var(--ink);
+}
+.inscription{
+  font-family:var(--font-carved);
+  font-size:16px;
+  line-height:1.9;
+  color:var(--ink);
+  letter-spacing:0.01em;
+}
+.inscription p{font-size:inherit; line-height:inherit; margin:0 0 12px;}
+.warning-block .field-note{border-top-color:var(--ink-faint);}
+
+.closing{
+  font-style:italic;
+  color:var(--ink-muted);
+  border-top:1px solid var(--line-soft);
+  padding-top:16px;
+  margin-top:8px;
+}
+
+@media (max-width:380px){
+  h1.site-title{font-size:19px;}
+  p{font-size:15.5px;}
+}
+</style>
+</head>
+<body>
+<a href="chartered-realm-map.html" style="position:fixed;top:8px;left:8px;z-index:999;background:rgba(0,0,0,0.6);color:#ecdfc0;font-family:monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:3px;text-decoration:none;border:1px solid rgba(255,255,255,0.25);">&#8592; Map</a>
+
+<div class="site">
+  <div class="site-label">THE OLD ROAD, NORTH OF THE FOURTH WARD · UNREGISTERED SITE</div>
+
+  <div class="frame">
+    <div class="status-bar">
+      <div class="status-left">
+        <span class="dot"></span>
+        <span>NOTHING HERE IS UNDER GUARD</span>
+      </div>
+      <div class="status-right" id="statusRight">APPROACH</div>
+    </div>
+
+    <div class="nav" id="nav"></div>
+
+    <div class="page" id="page"></div>
+  </div>
+</div>
+
+<script>
+const SECTIONS = [
+  { id:"approach", title:"Approaching the Ruin" },
+  { id:"mural", title:"The Outer Wall" },
+  { id:"warning", title:"The Inner Chamber" }
+];
+
+let activeSection = "approach";
+
+function renderNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = SECTIONS.map(s =>
+    `<div class="nav-pill ${s.id===activeSection?'active':''}" data-id="${s.id}">${s.title}</div>`
+  ).join('');
+  nav.querySelectorAll('.nav-pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      activeSection = p.dataset.id;
+      renderNav();
+      renderPage();
+      document.getElementById('page').scrollTop = 0;
+    });
+  });
+}
+
+function renderApproach(){
+  document.getElementById('statusRight').textContent = 'APPROACH';
+  return `
+    <div class="eyebrow">A Place Some of You Have Seen Firsthand</div>
+    <h1 class="site-title">Approaching the Ruin</h1>
+    <p>The tower stood taller once. What's left is a broken third of it, moss-eaten, leaning very slightly toward the road as though it's been trying to lie down for seven hundred years and hasn't quite finished the job. It is one of dozens like it scattered along the old Chain's path, and by a wide margin the closest one to Cornerstone.</p>
+    <p>Officially, this site does not exist. The standing order requiring citizens to report old-Compact devices and structures applies here as much as anywhere, and officially, someone should have reported this tower generations ago. Nobody has. It is close enough to the road that everyone in the Fourth Ward knows it's here, and far enough from any guardhouse that nobody has ever quite gotten around to the reporting.</p>
+    <p>Children dare each other to touch the outer wall. Fewer dare each other to go inside, and of those who do, most come back quieter than they went in. If you have been here before, on a dare or otherwise, you already know that "quieter" is the right word, and not one you chose lightly at the time.</p>
+    <div class="divider">✦ ✦ ✦</div>
+    <p class="closing">The wall itself is carved, faintly, beneath centuries of lichen. Most who visit never bother clearing it. Those who do usually wish, a little, that they hadn't.</p>
+  `;
+}
+
+function renderMural(){
+  document.getElementById('statusRight').textContent = 'THE OUTER WALL';
+  return `
+    <div class="eyebrow">Two Panels, Cleared By Hand</div>
+    <h1 class="site-title">The Outer Wall</h1>
+    <p>The carving beneath the lichen isn't Chancellery record-keeping and isn't shrine scripture. It was cut into the stone by whoever raised the tower, in the years the tower still worked, which makes it older than every account of the Severance kept anywhere else in Cornerstone. Clearing the moss takes a few minutes of patient rubbing with a dry cloth. It has clearly been done before, by other hands, more than once.</p>
+
+    <div class="rubbing">
+      <div class="rubbing-label">PANEL ONE · WEST FACE</div>
+      <div class="rubbing-surface unrubbed" data-panel="panel1">
+        <div class="rubbing-prompt">Centuries of moss and lichen obscure this panel.<span>Clear it by hand</span></div>
+      </div>
+      <div class="rubbing-revealed" data-panel="panel1">
+        <h4>What the Rubbing Shows</h4>
+        <p>Three figures of different height and bearing, hands joined at a single carved point, and above them a line of small linked circles running the width of the panel — the towers of the Chain, laid out in sequence like beads on a string. Beneath the joined hands, cut smaller and plainer than everything else, a single word survives clearly enough to read: <strong>together.</strong></p>
+        <div class="field-note">
+          <span class="field-note-label">Cleared previously, hand unknown</span>
+          Whoever built this didn't carve a king or a battle here. They carved the handhold itself. I don't know why that's the detail that's stayed with me since I left.
+        </div>
+      </div>
+    </div>
+
+    <div class="rubbing">
+      <div class="rubbing-label">PANEL TWO · WEST FACE, LOWER</div>
+      <div class="rubbing-surface unrubbed" data-panel="panel2">
+        <div class="rubbing-prompt">Centuries of moss and lichen obscure this panel.<span>Clear it by hand</span></div>
+      </div>
+      <div class="rubbing-revealed" data-panel="panel2">
+        <h4>What the Rubbing Shows</h4>
+        <p>The same three figures, but the joined hands are gone. In their place, the stone is simply smooth, as if that part of the carving was never finished, or was finished and then deliberately worked flat again. The line of linked circles above still runs the width of the panel. Every circle is carved as a hollow ring rather than a filled one, this time. Beneath, where the first panel read <em>together</em>, this panel has no word at all. Just the smoothed-over place where one should be.</p>
+        <div class="field-note">
+          <span class="field-note-label">Cleared previously, hand unknown</span>
+          I've heard people say the second panel shows a betrayal. I don't think that's what I saw. I think it shows an absence. Those aren't the same carving, and I don't think they mean the same thing.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderWarning(){
+  document.getElementById('statusRight').textContent = 'THE INNER CHAMBER';
+  return `
+    <div class="eyebrow">Past the Threshold, Where the Moss Doesn't Grow</div>
+    <h1 class="site-title">The Inner Chamber</h1>
+    <p>Past the outer wall, through a gap where a door used to be, the tower's inner chamber is bare stone and old ash from other visitors' torches. Everything here is exactly as weathered as seven hundred years would suggest. Everything except one wall.</p>
+    <p>A single panel near the base of the dead relay mechanism is not weathered at all. No moss has ever taken root on it, though moss covers the stone on every side of it without difficulty. The lettering is not the same style as the mural outside; it doesn't match any script kept on file at the Library, the Shrine, or anywhere else in Cornerstone. It is, nonetheless, perfectly legible, in a way nothing else in this tower is.</p>
+
+    <div class="warning-block">
+      <div class="warning-eyebrow">CARVED, CONDITION: UNACCOUNTABLY PRISTINE</div>
+      <h4>The Inscription</h4>
+      <div class="inscription">
+        <p>To those who would bind many hands into one:</p>
+        <p>You call it a wound. I call it a door, closed. What passed between you when you moved as one was never as harmless as you have let yourselves forget.</p>
+        <p>I did not take the gift to punish you. I took it because a hundred hands moving together, unwatched, unaccountable, reaching further than any one of you could reach alone, was never merely safety. It was an invitation. Something was always going to answer it eventually. I chose to be the one who did.</p>
+        <p>Work alone. Work in pairs, if you must, where a broken promise breaks only one heart. Do not gather. Do not bind. Do not remember how.</p>
+        <p>I will not warn you a second time.</p>
+      </div>
+      <div class="field-note">
+        <span class="field-note-label">Field note, appended by a later hand</span>
+        We have tried three times to transplant moss directly onto this lettering, taken from healthy growth not two feet away. It dies within the week, every time. We have stopped trying a fourth.
+      </div>
+    </div>
+
+    <p class="closing">Whoever, or whatever, carved that wall clearly believes it was protecting something. Whether that makes the warning easier to ignore, or harder, is not a question this ruin is going to answer for you.</p>
+  `;
+}
+
+function renderPage(){
+  const page = document.getElementById('page');
+  if(activeSection === 'approach') page.innerHTML = renderApproach();
+  else if(activeSection === 'mural') page.innerHTML = renderMural();
+  else page.innerHTML = renderWarning();
+
+  page.querySelectorAll('.rubbing-surface.unrubbed').forEach(surf=>{
+    surf.addEventListener('click', ()=>{
+      const panel = surf.dataset.panel;
+      surf.style.display = 'none';
+      page.querySelector(`.rubbing-revealed[data-panel="${panel}"]`).classList.add('shown');
+    });
+  });
+}
+
+renderNav();
+renderPage();
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Chartered Realm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink-black:#151109;
+  --ink-black-edge:#0a0805;
+  --vellum:#ecdfc0;
+  --ink:#2e2013;
+  --ink-muted:#6b5a42;
+  --gold:#a1791f;
+  --gold-bright:#c79a3f;
+  --line:#5a4a30;
+
+  --font-cere:'Cinzel', 'Times New Roman', serif;
+  --font-read:'EB Garamond', Georgia, serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:radial-gradient(ellipse at 50% 30%, #241a0e 0%, var(--ink-black) 55%, var(--ink-black-edge) 100%);
+  font-family:var(--font-read);
+  color:var(--vellum);
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.title-card{
+  max-width:460px;
+  width:100%;
+  padding:44px 30px 40px;
+  text-align:center;
+}
+
+.eyebrow{
+  font-family:var(--font-cere);
+  font-size:11px;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold-bright);
+  margin:0 0 16px;
+}
+
+h1{
+  font-family:var(--font-cere);
+  font-size:34px;
+  font-weight:700;
+  letter-spacing:0.02em;
+  margin:0 0 6px;
+  color:var(--vellum);
+  line-height:1.2;
+}
+
+.subtitle{
+  font-family:var(--font-cere);
+  font-size:13px;
+  font-style:normal;
+  letter-spacing:0.08em;
+  color:var(--gold);
+  margin:0 0 28px;
+  text-transform:uppercase;
+}
+
+.rule{
+  width:70px;
+  height:2px;
+  background:var(--gold);
+  margin:0 auto 28px;
+  opacity:0.7;
+}
+
+p{
+  font-size:17px;
+  line-height:1.8;
+  color:#d6c8a6;
+  margin:0 0 16px;
+}
+p:last-of-type{margin-bottom:34px;}
+
+.enter-btn{
+  display:inline-block;
+  font-family:var(--font-cere);
+  font-size:13px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:#1a1408;
+  background:var(--gold);
+  border:1px solid var(--gold-bright);
+  padding:15px 30px;
+  border-radius:2px;
+  text-decoration:none;
+  font-weight:600;
+}
+.enter-btn:active{background:var(--gold-bright);}
+
+.rules-link{
+  display:block;
+  margin-top:18px;
+  font-family:var(--font-cere);
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--gold);
+  text-decoration:none;
+  border-bottom:1px solid var(--line);
+  padding-bottom:2px;
+  display:inline-block;
+}
+.rules-link:active{color:var(--gold-bright);}
+
+@media (max-width:380px){
+  h1{font-size:28px;}
+  p{font-size:15.5px;}
+}
+</style>
+</head>
+<body>
+
+<div class="title-card">
+  <div class="eyebrow">A One-Shot for the Chartered Realm</div>
+  <h1>The Broken Chain</h1>
+  <div class="subtitle">Welcome to Cornerstone</div>
+  <div class="rule"></div>
+
+  <p>In this world, the ability to plan, coordinate, and lead others was once a gift shared freely, and then, seven hundred years ago, it was almost entirely lost. What remains is a city that has forgotten how to work together, run by guilds that no longer quite agree on whose job anything is.</p>
+  <p>A few people still carry the old gift. You are about to find out whether that includes you.</p>
+  <p>Before your character is arrested and this story properly begins, take some time to walk through Cornerstone as they would have known it: its library, its shrine, its market, its guard post, and the ruin nobody talks about. Nothing you find is required reading. All of it will make the world feel a little more like somewhere you've actually been.</p>
+
+  <a class="enter-btn" href="chartered-realm-map.html">Enter Cornerstone</a>
+  <br>
+  <a class="rules-link" href="chartered-realm-manual.html">Go straight to the Rules Reference</a>
+</div>
+
+</body>
+</html>

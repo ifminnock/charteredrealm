@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Market Square & The Salted Rope — Cornerstone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --wood:#4a3320;
+  --wood-edge:#2c1c10;
+
+  --canvas:#ecdcb4;
+  --canvas-shadow:#dbc593;
+  --canvas-deep:#c9ac74;
+
+  --tavern-panel:#3c2a1c;
+  --tavern-panel-deep:#4d3d2c;
+
+  --ink:#3a2a18;
+  --ink-muted:#6e563a;
+  --ink-faint:#9c8563;
+  --ink-light:#e8d8b8;
+
+  --brass:#a1731f;
+  --brass-bright:#c4923a;
+  --verdigris:#5b7362;
+  --verdigris-bright:#799183;
+
+  --line:#b89a5e;
+  --line-soft:#cbb37e;
+
+  --font-sign:'Caveat', cursive;
+  --font-read:'Lora', Georgia, serif;
+  --font-mono:'IBM Plex Mono', 'Courier New', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--wood-edge);
+  font-family:var(--font-read);
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+.square{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(ellipse at 50% 0%, #5c4128 0%, var(--wood) 55%, var(--wood-edge) 100%);
+  transition:background 0.3s;
+}
+.square.tavern-active{
+  background:radial-gradient(ellipse at 50% 0%, #3a2a1c 0%, #241812 55%, #17100b 100%);
+}
+
+.beam-label{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.12em;
+  color:#c9b083;
+  text-align:center;
+  padding:10px 14px 5px;
+  text-transform:uppercase;
+}
+
+.frame{
+  position:relative;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  margin:0 10px 10px;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 4px #2c1c10, 0 8px 24px rgba(0,0,0,0.6);
+  background:var(--canvas);
+  transition:background 0.3s;
+}
+.frame.tavern-active{background:var(--tavern-panel);}
+
+.top-strip{
+  background:var(--ink);
+  color:var(--ink-light);
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  flex-shrink:0;
+}
+.sun-icon{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--brass-bright);
+  box-shadow:0 0 6px 1px rgba(196,146,58,0.7);
+  flex-shrink:0;
+  animation:glow 3s infinite ease-in-out;
+}
+@keyframes glow{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.top-left{display:flex;align-items:center;gap:7px;}
+.top-right{color:#9c8563;font-size:9px;}
+
+.mode-tabs{
+  display:flex;
+  background:var(--canvas-deep);
+  border-bottom:1px solid var(--line);
+  flex-shrink:0;
+}
+.frame.tavern-active .mode-tabs{background:#241812; border-color:#4a3220;}
+.mode-tab{
+  flex:1;
+  padding:14px 6px;
+  text-align:center;
+  font-family:var(--font-sign);
+  font-size:19px;
+  font-weight:700;
+  color:var(--ink-muted);
+  background:none;
+  border:none;
+  border-bottom:3px solid transparent;
+  cursor:pointer;
+}
+.mode-tab.active{color:var(--ink); border-bottom-color:var(--brass);}
+.frame.tavern-active .mode-tab{color:#a1927a;}
+.frame.tavern-active .mode-tab.active{color:var(--ink-light); border-bottom-color:var(--brass-bright);}
+
+/* sub tabs (menu / rumors) */
+.sub-tabs{
+  display:none;
+  gap:8px;
+  padding:10px 14px;
+  background:#241812;
+  border-bottom:1px solid #4a3220;
+  flex-shrink:0;
+}
+.sub-tabs.visible{display:flex;}
+.sub-tab{
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.07em;
+  text-transform:uppercase;
+  color:#a1927a;
+  background:rgba(0,0,0,0.25);
+  border:1px solid #4a3220;
+  border-radius:1px;
+  padding:8px 12px;
+  cursor:pointer;
+}
+.sub-tab.active{
+  background:var(--brass);
+  color:#fff6e0;
+  border-color:var(--brass-bright);
+}
+
+.content{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:18px 16px 44px;
+  min-height:0;
+}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px;}
+
+.heading{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--brass);
+  margin:2px 0 5px;
+}
+.frame.tavern-active .heading{color:var(--brass-bright);}
+
+h1.title{
+  font-family:var(--font-sign);
+  font-size:28px;
+  font-weight:700;
+  margin:0 0 14px;
+  line-height:1.15;
+  border-bottom:2px solid var(--line);
+  padding-bottom:10px;
+}
+.frame.tavern-active h1.title{color:var(--ink-light); border-color:#4a3220;}
+
+.intro{
+  font-size:15.5px;
+  line-height:1.75;
+  margin:0 0 20px;
+  color:var(--ink-muted);
+}
+.frame.tavern-active .intro{color:#c2b191;}
+
+/* ===== EXPANDABLE CARD (shared: stalls, menu, rumors) ===== */
+.card{
+  background:#f2e6c4;
+  border:1px solid var(--line);
+  border-radius:1px;
+  margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  overflow:hidden;
+}
+.frame.tavern-active .card{
+  background:var(--tavern-panel-deep);
+  border-color:#5a4630;
+}
+.card-head{
+  padding:14px 16px;
+  cursor:pointer;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.card-head-text{flex:1;}
+.card-name{
+  font-family:var(--font-sign);
+  font-size:21px;
+  font-weight:700;
+  margin:0 0 4px;
+  line-height:1.1;
+}
+.frame.tavern-active .card-name{color:var(--brass-bright);}
+.card-tag{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  padding:3px 7px;
+  border-radius:1px;
+  margin-bottom:8px;
+}
+.tag-brass{background:var(--brass); color:#fff6e0;}
+.tag-verdigris{background:var(--verdigris); color:#f0f5ee;}
+.tag-neutral{background:var(--ink-faint); color:#fff8ea;}
+.card-teaser{
+  font-size:14.5px;
+  line-height:1.6;
+  color:var(--ink-muted);
+  font-style:italic;
+  margin:0;
+}
+.frame.tavern-active .card-teaser{color:#b0a084;}
+.chevron{
+  font-family:var(--font-mono);
+  font-size:14px;
+  color:var(--brass);
+  flex-shrink:0;
+  transition:transform 0.2s;
+  margin-top:3px;
+}
+.card.open .chevron{transform:rotate(180deg);}
+.card-body{
+  display:none;
+  padding:0 16px 16px;
+  border-top:1px dashed var(--line-soft);
+  margin-top:2px;
+  padding-top:12px;
+}
+.frame.tavern-active .card-body{border-top-color:#5a4630;}
+.card.open .card-body{display:block;}
+.card-body p{
+  font-size:15px;
+  line-height:1.72;
+  margin:0 0 11px;
+}
+.frame.tavern-active .card-body p{color:var(--ink-light);}
+.card-body p:last-child{margin-bottom:0;}
+.card-body h4{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--brass);
+  margin:14px 0 6px;
+}
+.card-body h4:first-child{margin-top:0;}
+.frame.tavern-active .card-body h4{color:var(--brass-bright);}
+
+/* ===== CRIER NOTICE (market, non-expanding) ===== */
+.crier-notice{
+  background:var(--canvas-deep);
+  border-left:3px solid var(--brass);
+  padding:14px 16px;
+  margin:14px 0;
+  font-size:15px;
+  line-height:1.72;
+  border-radius:1px;
+}
+.crier-notice .cn-label{
+  display:block;
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:6px;
+}
+
+/* ===== RUMOR-SPECIFIC bits ===== */
+.rumor-tag{
+  font-family:var(--font-mono);
+  font-size:8.5px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:#9c8563;
+}
+
+.divider{
+  text-align:center;
+  color:var(--brass);
+  font-size:13px;
+  letter-spacing:0.4em;
+  margin:18px 0;
+  opacity:0.6;
+}
+.frame.tavern-active .divider{color:var(--brass-bright); opacity:0.45;}
+
+@media (max-width:380px){
+  h1.title{font-size:24px;}
+  .card-name{font-size:19px;}
+}
+</style>
+</head>
+<body>
+<a href="chartered-realm-map.html" style="position:fixed;top:8px;left:8px;z-index:999;background:rgba(0,0,0,0.6);color:#ecdfc0;font-family:monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:3px;text-decoration:none;border:1px solid rgba(255,255,255,0.25);">&#8592; Map</a>
+
+<div class="square" id="square">
+  <div class="beam-label">MARKET SQUARE · CORNERSTONE, THIRD WARD</div>
+
+  <div class="frame" id="frame">
+    <div class="top-strip">
+      <div class="top-left">
+        <span class="sun-icon" id="sunIcon"></span>
+        <span id="stripLeft">MIDDAY TRADE</span>
+      </div>
+      <div class="top-right" id="stripRight">THE MARKETPLACE</div>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="market">The Market</button>
+      <button class="mode-tab" data-mode="tavern">The Salted Rope</button>
+    </div>
+
+    <div class="sub-tabs" id="subTabs">
+      <button class="sub-tab active" data-sub="menu">The Menu</button>
+      <button class="sub-tab" data-sub="rumors">Rumors at the Bar</button>
+    </div>
+
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   MARKET DATA
+   ============================================================ */
+const MARKET = {
+  title:"The Market Square",
+  intro:"Come midday the square fills with awnings, and the awnings fill with everything Cornerstone still knows how to sell. Look closely and you'll notice the same truth every stall is quietly built around: nobody here has forgotten how to make things. What's gone missing is the knack for making the same thing twice, on schedule, at scale, without one hand knowing what the other is doing.",
+  stalls:[
+    {
+      name:"Tinker's Row",
+      tag:"tag-verdigris",
+      tagLabel:"SALVAGE & REPAIR ONLY",
+      teaser:"Patched relics, no two alike, and a queue longer than the guild wishes were true.",
+      body:`
+        <p>Six stalls in a row, none of them selling anything built new. What they sell is patched: a resonance-lock recovered from a collapsed relay tower, cleaned up and refitted to a merchant's strongbox; a load-bearing ward pulled from Compact-era ruins and grafted onto a bridge support that would otherwise have failed a decade ago.</p>
+        <p>Ask any of the tinkers whether they could build one of these from scratch and you'll get the same answer, more or less word for word: the craft to shape any single piece hasn't been lost. What's been lost is the sort of coordinated effort it once took to run a hundred such pieces through a hundred such hands on the same schedule, so that a whole city's worth of towers could be built once, together, rather than one tinker patching one fragment at a time forever.</p>
+        <h4>A Case in Point</h4>
+        <p>The plow at the third stall from the corner is held together from four different donor mechanisms, none of them originally designed to meet. It works. It also makes a faint grinding note on every third furrow, which the tinker who sold it calls "character" and every farmer who's bought one calls "the thing you learn to plow around."</p>
+      `
+    },
+    {
+      name:"The Rune Table",
+      tag:"tag-brass",
+      tagLabel:"MADE TO ORDER",
+      teaser:"One extraordinary thing at a time. Never forty of them by Friday.",
+      body:`
+        <p>Unlike Tinker's Row, the elven crafters at the Rune Table will build you something new, and it will work exactly as promised. Magic itself never broke. An elven artisan can still cut a ward-stone or bind a working exactly as her grandmother's grandmother could.</p>
+        <p>What she cannot do, and says so plainly if asked, is train forty apprentices to cut forty identical stones on the same afternoon for a client who needs forty. She can make you one extraordinary thing. She cannot make you a hundred ordinary ones. That distinction, more than any spell gone missing, is the real shape of what the Realm lost.</p>
+        <h4>What the Old Ledgers Say</h4>
+        <p>Guild records from the Golden Age describe entire halls of crafters working in matched rhythm, one binding a ward while a dozen others prepared the next twelve in sequence, all of it timed against a schedule no single crafter held in her head alone. Nobody currently at the Rune Table has ever seen that done. Most of them aren't sure they believe the old ledgers, except that the ledgers are very specific about the numbers, and elves are not known for exaggerating a headcount.</p>
+      `
+    },
+    {
+      name:"The Brass Line",
+      tag:"tag-neutral",
+      tagLabel:"CHANCELLERY BOOTH · FREE ADMISSION",
+      teaser:"Officially a tax booth. Unofficially, the best show in Cornerstone, and it runs every day but festival days.",
+      body:`
+        <p>Three clerks, three separate ledgers, and a jurisdictional dispute between the Merchants' and Craftsmen's Guilds that has been running so long it now has regulars. People bring lunch. Somebody sells honeyed nuts to the crowd from a cart positioned for exactly this purpose. There is, unofficially, a running tally chalked on the wall behind the booth: <em>Days Since a Ruling.</em> The record is two hundred and eleven.</p>
+        <h4>Act One: The Ward-Stone Dispute</h4>
+        <p>A tinker selling a recovered ward-stone is currently required to pay one tax to the Merchants' Guild for the sale, a separate fee to the Craftsmen's Guild for the repair, and a small stamped fine to the Brass Line itself for failing to specify which tax applied first. No clerk can explain the ordering. All three insist it makes sense once you've filed enough forms to understand it, and none of the three has ever managed to demonstrate this to a customer's satisfaction.</p>
+        <h4>Act Two: The Axle Question</h4>
+        <p>A newer bit, and the crowd's current favorite: a repaired cart axle, built from traded parts, has raised the question of whether it counts as "manufactured" (Craftsmen's jurisdiction) or "traded" (Merchants' jurisdiction), since it was manufactured out of already-traded materials. The Merchants' clerk has begun threatening to summon a Scholar to interpret the original guild charter language. The Craftsmen's clerk has pointed out that summoning a Scholar would itself require a jurisdictional ruling on whether "interpretation" counts as a service subject to either guild's fee. The crowd is currently taking wagers on whether this resolves before winter.</p>
+        <h4>Act Three: The Crown's Cut</h4>
+        <p>A third clerk sits slightly apart from the other two, collecting a small standing fee "for adjudicating the other two guilds' dispute," a fee that has never, as far as anyone has been able to determine, been formally authorized by anyone. It has simply been collected long enough that stopping it now would require its own review, which would itself need to be adjudicated by someone, and the only obvious candidate for that job is the clerk currently collecting the fee.</p>
+      `
+    },
+    {
+      name:"The Weighmaster's Table",
+      tag:"tag-neutral",
+      tagLabel:"BRING YOUR OWN SCALE",
+      teaser:"Three official pounds. None of them agree, and everyone has opinions about why.",
+      body:`
+        <p>A "pound" of grain means something slightly different depending on whether you're weighing it against the Merchants' Guild standard, the Craftsmen's Guild standard, or the ceremonial Compact-era stone kept under glass at the Weighmaster's own table, which nobody uses for actual trade but which everybody invokes whenever they want to accuse the other two standards of cheating.</p>
+        <p>Most working merchants have simply given up and bring their own scale, weighted to whichever standard their regular customers trust most, and haggle the difference in price rather than the difference in measurement. The one unit of measure everyone in Cornerstone still trusts without argument is a loaf of bread, because you can at least see with your own eyes whether you're being shorted.</p>
+      `
+    },
+    {
+      name:"The Apprentice Board",
+      tag:"tag-neutral",
+      tagLabel:"POSTED CREDENTIALS, MOSTLY EXPIRED",
+      teaser:"Every guild agrees an apprentice must be properly trained. No two of them agree on trained in what, exactly.",
+      body:`
+        <p>A mason trained under the old cross-guild journeyman agreement, back when such agreements still meant something, technically cannot be hired by a master certified under the newer Craftsmen's-only standard, since the two credentials were never formally reconciled after the guilds split their training programs three generations back.</p>
+        <p>In practice this means willing, competent labor sits idle at the board most mornings while masters short-handed on a job wait for a "properly matched" apprentice who may never come. The board itself still bears a stamp reading <strong>PROVISIONAL — PENDING GUILD RECONCILIATION</strong> on nearly a third of its postings. The stamp is forty-one years old. Nobody currently working the board remembers it being anything else.</p>
+      `
+    }
+  ],
+  criers:[
+    {
+      label:"OVERHEARD FROM A GUILD CRIER, POSTED NOON",
+      body:"By order of the Merchants' Guild: the standing price for a newly-forged plow blade has risen again this season, owing to the continued scarcity of masters willing to certify an apprentice's work without a full guild inspection, which now requires the signature of no fewer than three guildmasters, only one of whom is currently in the city."
+    },
+    {
+      label:"NOTICE, POSTED AND THEN PARTIALLY UNPOSTED",
+      body:"The Chancellery regrets to announce that yesterday's notice regarding new market stall fees has been postponed pending review by the committee responsible for reviewing postponements. A further notice will follow once that committee has been convened, a date for which has not yet been set."
+    },
+    {
+      label:"SCRAWLED BENEATH THE OFFICIAL NOTICE, DIFFERENT HAND",
+      body:"they said that last year too"
+    }
+  ]
+};
+
+/* ============================================================
+   TAVERN DATA
+   ============================================================ */
+const TAVERN_MENU = {
+  title:"The Salted Rope",
+  intro:"By evening the common room fills, the hearth actually draws for once, and the board by the door lists what's on offer tonight. Most of it is honest food. A little of it is named for things this city still hasn't gotten over.",
+  items:[
+    {
+      name:"The Salted Rope",
+      tag:"tag-brass",
+      tagLabel:"THE HOUSE POUR · ASK FOR IT BY NAME",
+      teaser:"The drink the tavern is named for, and the only thing on this board that requires four different peoples to agree on anything.",
+      body:`
+        <p>Poured in careful order rather than shaken: a measure of pale elven wine first, for the base; a slow float of dark dwarven grain-spirit next, weighted just enough to layer rather than mix; a generous pour of ordinary human ale on top of that, the same brew as the Unanimous; and last, along the rim rather than in it, a thin smoked orcish mead that's meant to hit your lip before the rest of the drink does.</p>
+        <p>Done right, the layers hold for a few slow sips before they finally give way and blend into something none of the four could manage alone. Done wrong, by an impatient hand or a bad pour, it's just four strong drinks fighting each other in one cup, and everyone in this tavern who's had it both ways agrees you can tell the difference immediately.</p>
+        <h4>Why the Tavern Is Named for It</h4>
+        <p>The story the keep tells, and swears is older than she is: the drink comes from the barge crews who used to work the three river valleys before anyone worried much about permits, back when a single boat's crew was as likely to be one of each people as not. A dwarf at the tiller, an elf reading the current, a human keeping the schedule, an orc hauling line, and all four of them knowing that a rope laid up from a single strand frays and snaps the first time the river tests it, but a rope laid up from several, twisted together properly, holds through weather that would take a lesser line clean apart.</p>
+        <p>The crews are said to have mixed this drink at the end of a hard crossing, one layer from whatever each of them had brought aboard, and to have judged a crossing well run by whether the drink still held its layers by the time it reached the bottom of the cup. The tavern kept the name long after the barges mostly stopped running mixed crews. Ask the keep why, and she'll tell you it's easier to remember how something's supposed to work than to actually do it that way, and a good drink is at least a start.</p>
+      `
+    },
+    {
+      name:"Founder's Broth",
+      tag:"tag-neutral",
+      tagLabel:"THE HOUSE STEW",
+      teaser:"Named for the well. Served every night it can be, which is most nights.",
+      body:`
+        <p>A hearty root-and-barley stew, thick enough to stand a spoon in, served with a heel of bread on the side. It's named, somewhat grimly, for Founder's Well, and the tavern-keep will tell you so if asked, though most regulars have stopped asking.</p>
+        <h4>Why the Name Stuck</h4>
+        <p>The story goes that the broth was first served, free, to the volunteers who worked the well repair decades back, and kept on the menu afterward as a quiet way of remembering them without having to say so out loud every time. Nobody's ever taken it off the board. Nobody's ever suggested it either.</p>
+      `
+    },
+    {
+      name:"The Unanimous Ale",
+      tag:"tag-brass",
+      tagLabel:"HOUSE BREW",
+      teaser:"So named because it's the only thing in Cornerstone every guild agrees is good.",
+      body:`
+        <p>A dark, mild ale, brewed to the same recipe for three generations, and the tavern-keep's proudest boast: no guild has ever filed a complaint about it, no Chancellery clerk has ever taxed it twice by accident, and no two regulars have ever come to blows over whose turn it was to buy a round of it.</p>
+        <p>"It's the one thing this city has managed to coordinate on without a committee," the keep is fond of saying, usually right before pouring a second round unasked.</p>
+      `
+    },
+    {
+      name:"Three Guilds' Pie",
+      tag:"tag-neutral",
+      tagLabel:"MEAT PIE, SERVED HOT",
+      teaser:"Named for the fact that no single butcher in the ward could fill the order alone.",
+      body:`
+        <p>A hand pie made from three different cuts sourced from three different butchers, none of whom currently stock enough of any single cut to fill a standing order on their own. The tavern's solution, some years back, was simply to buy a third of what it needed from each and stop asking why the supply had gotten so thin.</p>
+        <p>It's become something of a local joke: order the pie, and you're eating a small, edible metaphor for the entire ward's supply chain. It's also, everyone agrees, very good, which the joke somehow makes funnier rather than less true.</p>
+      `
+    },
+    {
+      name:"Cold Comfort Bread",
+      tag:"tag-verdigris",
+      tagLabel:"SERVED AT ROOM TEMPERATURE, ON PURPOSE NOW",
+      teaser:"Started as an apology. Became the regular way it's served.",
+      body:`
+        <p>The ovens on this side of the ward run on an inconsistent schedule, ever since the chimney and stonemasons' guilds stopped agreeing on flue inspections, and the bread here has been served a little cooler than ideal for longer than the current cook has worked here. Eventually the tavern simply stopped apologizing for it and put it on the menu as a feature.</p>
+      `
+    },
+    {
+      name:"The Long Wait",
+      tag:"tag-neutral",
+      tagLabel:"SLOW-BREWED SPIRIT",
+      teaser:"Ask for it and you'll get it. Eventually.",
+      body:`
+        <p>A slow-brewed spirit that takes the better part of a season to prepare properly, and the tavern only ever has a few bottles on hand at a time. Ordering it has become a bit of a rite of patience among regulars: you put your name in, and you wait, and the keep insists this is the entire point.</p>
+      `
+    },
+    {
+      name:"Traveler's Plate",
+      tag:"tag-brass",
+      tagLabel:"FOR NEWCOMERS",
+      teaser:"A sampler, and the fastest way to meet everyone at the bar at once.",
+      body:`
+        <p>A bit of everything on the board, meant for newcomers who don't yet know what they want. Ordering it is also, functionally, a way of announcing yourself as new to the ward, since nobody who's lived here more than a season orders the sampler. Expect at least one regular to strike up a conversation before the plate arrives.</p>
+      `
+    }
+  ]
+};
+
+const TAVERN_RUMORS = {
+  title:"Rumors at the Bar",
+  intro:"Half of what gets said in here isn't news. It's a grievance, passed hand to hand like a mug nobody wants to be holding when the bill comes. A little of it might be worth more than that. Nobody in here will tell you which half.",
+  rumors:[
+    {
+      name:"They Still Haven't Fixed the Aqueduct",
+      tag:"tag-verdigris",
+      tagLabel:"CONSENSUS: SADLY TRUE",
+      teaser:"Six years under review, and the crack hasn't gotten any smaller for the waiting.",
+      body:`<p>The aqueduct repair on Founder's Row has been "under review" for six years running. Three separate guild inspectors have confirmed the crack is real. None of them has been willing to be the one who signs off on whose budget fixes it, and the review committee tasked with deciding whose budget that is has itself been delayed twice pending a report on the committee's own scope.</p>`
+    },
+    {
+      name:"Three Guilds, One Pothole",
+      tag:"tag-verdigris",
+      tagLabel:"CONSENSUS: TRUE, AND EVERYONE'S SEEN IT",
+      teaser:"The crossing at Miller's Court has needed repaving for two winters running.",
+      body:`<p>The Craftsmen's Guild says it's a road matter for the Chancellery. The Chancellery says it's a guild matter for the Craftsmen. In the meantime, the Merchants' Guild has started charging carters a toll for "navigating a known hazard," which is somehow the only part of this anyone has managed to organize quickly.</p>`
+    },
+    {
+      name:"Nobody Can Forge a Matching Pair Anymore",
+      tag:"tag-neutral",
+      tagLabel:"CONSENSUS: PROBABLY TRUE, ASK A SMITH",
+      teaser:"Ask for two identical blades and watch a smith's face fall.",
+      body:`<p>Ask a smith to forge you a blade and you'll get a fine one. Ask for a matching pair and you'll wait twice as long, pay twice as much, and still end up with two swords that don't quite share a scabbard. Nobody's figured out how to make the second one the same way as the first since before the Severance, and most smiths have stopped promising otherwise.</p>`
+    },
+    {
+      name:"The Form For Filing a Form",
+      tag:"tag-neutral",
+      tagLabel:"CONSENSUS: CONFIRMED, PAINFULLY",
+      teaser:"To petition the Chancellery, first petition to be allowed to petition.",
+      body:`<p>To petition the Chancellery for anything requiring more than one guild's approval, a citizen must first file a request to be added to the docket, which itself requires a separate form confirming the citizen understands the docket is currently full. Regulars trade tips at the bar on which clerk is least likely to reject the confirmation form on a technicality.</p>`
+    },
+    {
+      name:"Half the Chimneys on the East Side Won't Draw",
+      tag:"tag-verdigris",
+      tagLabel:"CONSENSUS: TRUE, BRING A SECOND BLANKET",
+      teaser:"Two guilds, one flue, and neither will inspect it first.",
+      body:`<p>The chimney guild and the stonemasons' guild stopped agreeing on whose job it is to inspect a shared flue some years back, and half the hearths on the east side haven't drawn properly since. The standing advice from both guilds, delivered separately and identically, is to keep a second blanket handy.</p>`
+    },
+    {
+      name:"The Weighmaster's Scale Argument Nearly Came to Blows",
+      tag:"tag-neutral",
+      tagLabel:"CONSENSUS: EXAGGERATED, PROBABLY",
+      teaser:"A grain dispute at the Weighmaster's Table got loud enough to draw the Watch.",
+      body:`<p>Word from the square is that a farmer and a buyer nearly came to blows this week over which of the three "official" pounds should settle their trade, before a passing Watch officer settled it the old-fashioned way: by refusing to leave until they'd split the difference. Ask three people at the bar and you'll get three different accounts of how close it actually came to a fight.</p>`
+    },
+    {
+      name:"The Brass Line Has a Betting Pool Now",
+      tag:"tag-brass",
+      tagLabel:"CONSENSUS: CONFIRMED, SOME REGULARS HAVE A STAKE",
+      teaser:"The tax-booth dispute has gotten popular enough to have odds.",
+      body:`<p>Apparently the ongoing jurisdictional dispute at the Brass Line has attracted enough of a regular crowd that somebody's started taking bets on how long the current dispute lasts before a ruling. Current odds favor "no ruling before the spring festival," and the tavern-keep is rumored to have money on it herself.</p>`
+    },
+    {
+      name:"A Watch Officer Asked About Old Devices Again",
+      tag:"tag-neutral",
+      tagLabel:"CONSENSUS: UNCONFIRMED, TAKEN SERIOUSLY ANYWAY",
+      teaser:"Someone's been going stall to stall asking after old-Compact salvage.",
+      body:`<p>More than one tinker at Tinker's Row has mentioned a Watch officer coming through recently, asking pointed questions about any old-Compact device fragments that might have come in unreported. Nobody seems to know what prompted it. Most people here have decided not to ask too loudly.</p>`
+    },
+    {
+      name:"Quiet Lights on the Old Road",
+      tag:"tag-verdigris",
+      tagLabel:"CONSENSUS: NOBODY WANTS IT TO BE TRUE",
+      teaser:"A carter swears a dead relay tower had a light in it three nights running.",
+      body:`<p>A carter swears one of the old relay towers out past the north fields had a light in it three nights running last month, faint, like something waking up tired. Nobody's gone out to check. Most people here would rather not know which answer they'd prefer.</p>`
+    }
+  ]
+};
+
+/* ============================================================
+   RENDER HELPERS
+   ============================================================ */
+function cardHTML(item, idx, groupId){
+  return `
+    <div class="card" data-group="${groupId}" data-idx="${idx}">
+      <div class="card-head">
+        <div class="card-head-text">
+          <div class="card-name">${item.name}</div>
+          ${item.tagLabel ? `<span class="card-tag ${item.tag}">${item.tagLabel}</span>` : ''}
+          <p class="card-teaser">${item.teaser}</p>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="card-body">${item.body}</div>
+    </div>
+  `;
+}
+
+function bindCards(container){
+  container.querySelectorAll('.card-head').forEach(head=>{
+    head.addEventListener('click', ()=>{
+      head.closest('.card').classList.toggle('open');
+    });
+  });
+}
+
+/* ============================================================
+   RENDER: MARKET
+   ============================================================ */
+function renderMarket(){
+  const content = document.getElementById('content');
+  let html = `<div class="heading">A Location, Somewhere In Cornerstone</div>`;
+  html += `<h1 class="title">${MARKET.title}</h1>`;
+  html += `<p class="intro">${MARKET.intro}</p>`;
+
+  MARKET.stalls.forEach((s,i)=>{ html += cardHTML(s, i, 'market'); });
+
+  html += `<div class="divider">✦ ✦ ✦</div>`;
+
+  MARKET.criers.forEach(c=>{
+    html += `
+      <div class="crier-notice">
+        <span class="cn-label">${c.label}</span>
+        <p style="margin:0;">${c.body}</p>
+      </div>
+    `;
+  });
+
+  content.innerHTML = html;
+  bindCards(content);
+}
+
+/* ============================================================
+   RENDER: TAVERN (menu / rumors)
+   ============================================================ */
+let tavernSub = 'menu';
+
+function renderTavernMenu(){
+  const content = document.getElementById('content');
+  let html = `<div class="heading">A Location, Somewhere In Cornerstone</div>`;
+  html += `<h1 class="title">${TAVERN_MENU.title}</h1>`;
+  html += `<p class="intro">${TAVERN_MENU.intro}</p>`;
+  TAVERN_MENU.items.forEach((m,i)=>{ html += cardHTML(m, i, 'menu'); });
+  content.innerHTML = html;
+  bindCards(content);
+}
+
+function renderTavernRumors(){
+  const content = document.getElementById('content');
+  let html = `<div class="heading">Overheard, With Varying Confidence</div>`;
+  html += `<h1 class="title">${TAVERN_RUMORS.title}</h1>`;
+  html += `<p class="intro">${TAVERN_RUMORS.intro}</p>`;
+  TAVERN_RUMORS.rumors.forEach((r,i)=>{ html += cardHTML(r, i, 'rumors'); });
+  content.innerHTML = html;
+  bindCards(content);
+}
+
+function renderTavern(){
+  if(tavernSub === 'menu') renderTavernMenu();
+  else renderTavernRumors();
+}
+
+/* ============================================================
+   MODE / SUB-MODE SWITCHING
+   ============================================================ */
+let mode = 'market';
+
+function setMode(newMode){
+  mode = newMode;
+  const square = document.getElementById('square');
+  const frame = document.getElementById('frame');
+  const sunIcon = document.getElementById('sunIcon');
+  const subTabs = document.getElementById('subTabs');
+
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===mode));
+
+  if(mode === 'market'){
+    square.classList.remove('tavern-active');
+    frame.classList.remove('tavern-active');
+    subTabs.classList.remove('visible');
+    document.getElementById('stripLeft').textContent = 'MIDDAY TRADE';
+    document.getElementById('stripRight').textContent = 'THE MARKETPLACE';
+    sunIcon.style.background = 'var(--brass-bright)';
+    renderMarket();
+  } else {
+    square.classList.add('tavern-active');
+    frame.classList.add('tavern-active');
+    subTabs.classList.add('visible');
+    document.getElementById('stripLeft').textContent = 'AFTER DARK';
+    document.getElementById('stripRight').textContent = 'THE SALTED ROPE';
+    sunIcon.style.background = '#7a6a4a';
+    renderTavern();
+  }
+  document.getElementById('content').scrollTop = 0;
+}
+
+document.querySelectorAll('.mode-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=> setMode(tab.dataset.mode));
+});
+
+document.querySelectorAll('.sub-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    tavernSub = tab.dataset.sub;
+    document.querySelectorAll('.sub-tab').forEach(t=>t.classList.toggle('active', t.dataset.sub===tavernSub));
+    renderTavern();
+    document.getElementById('content').scrollTop = 0;
+  });
+});
+
+renderMarket();
+</script>
+</body>
+</html>

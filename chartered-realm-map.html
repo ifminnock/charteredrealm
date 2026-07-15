@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Cornerstone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cormorant:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --parchment:#e6d9b8;
+  --parchment-shadow:#d6c69a;
+  --parchment-deep:#c4b184;
+  --ink:#3a2e1c;
+  --ink-muted:#6b5a3c;
+  --ink-faint:#93825f;
+  --gold:#96701f;
+  --gold-bright:#b98f2f;
+  --line:#a48e5e;
+  --wood-edge:#241a10;
+  --font-title:'MedievalSharp', serif;
+  --font-read:'Cormorant', Georgia, serif;
+  --font-mono:'IBM Plex Mono', 'Courier New', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--wood-edge);
+  font-family:var(--font-read);
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+.hub{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(ellipse at 50% 0%, #3a2c1a 0%, var(--wood-edge) 65%);
+}
+
+.top-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:#c9b083;
+}
+.rules-link{
+  color:#fff6e0;
+  background:var(--gold);
+  text-decoration:none;
+  border:1px solid var(--gold-bright);
+  padding:12px 20px;
+  border-radius:2px;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:0.06em;
+}
+.rules-link:active{background:var(--gold-bright);}
+
+.map-frame{
+  flex:1;
+  margin:0 10px 10px;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 4px #2c1c10, 0 8px 24px rgba(0,0,0,0.6);
+  background:var(--parchment);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+.map-frame::before{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:5;
+  opacity:0.35;
+  background:repeating-linear-gradient(100deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 4px);
+  mix-blend-mode:multiply;
+}
+
+.map-title{
+  text-align:center;
+  padding:16px 10px 4px;
+}
+.map-title h1{
+  font-family:var(--font-title);
+  font-size:26px;
+  font-weight:400;
+  margin:0;
+  color:var(--ink);
+  letter-spacing:0.03em;
+}
+.map-title p{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin:5px 0 0;
+}
+
+.map-svg-wrap{
+  flex:0 0 auto;
+  padding:6px 10px 4px;
+}
+.map-svg-wrap svg{width:100%; height:auto; display:block;}
+
+.pin{cursor:pointer;}
+.pin-dot{
+  fill:var(--gold);
+  stroke:var(--ink);
+  stroke-width:1.5;
+  transition:fill 0.15s;
+}
+.pin:active .pin-dot, .pin:hover .pin-dot{fill:var(--gold-bright);}
+.pin-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  fill:var(--ink);
+  text-anchor:middle;
+}
+.landmark-label{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  fill:var(--ink-faint);
+  text-anchor:middle;
+  letter-spacing:0.04em;
+}
+.road{
+  fill:none;
+  stroke:var(--ink-faint);
+  stroke-width:2;
+  stroke-dasharray:1,7;
+  stroke-linecap:round;
+  opacity:0.7;
+}
+
+.legend{
+  padding:10px 18px 26px;
+  overflow-y:auto;
+  position:relative;
+  z-index:6;
+}
+.legend-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:var(--parchment-deep);
+  border:1px solid var(--line);
+  border-radius:1px;
+  padding:12px 14px;
+  text-decoration:none;
+  color:var(--ink);
+}
+.legend-item:active{background:var(--parchment-shadow);}
+.legend-num{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  color:#fff6e0;
+  background:var(--gold);
+  width:22px;height:22px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.legend-text{flex:1;}
+.legend-name{
+  font-family:var(--font-title);
+  font-size:18px;
+  font-weight:400;
+  line-height:1.1;
+}
+.legend-desc{
+  font-size:13.5px;
+  color:var(--ink-muted);
+  line-height:1.4;
+  margin-top:2px;
+}
+.legend-arrow{
+  font-family:var(--font-mono);
+  color:var(--gold);
+  font-size:14px;
+}
+
+@media (max-width:380px){
+  .map-title h1{font-size:22px;}
+}
+</style>
+</head>
+<body>
+
+<div class="hub">
+  <div class="top-bar">
+    <span>CORNERSTONE</span>
+    <a class="rules-link" href="chartered-realm-manual.html">Rules Reference</a>
+  </div>
+
+  <div class="map-frame">
+    <div class="map-title">
+      <h1>Cornerstone</h1>
+      <p>Tap a place to visit it before you're arrested</p>
+    </div>
+
+    <div class="map-svg-wrap">
+      <svg viewBox="0 0 600 620" xmlns="http://www.w3.org/2000/svg">
+        <!-- roads -->
+        <path class="road" d="M 300 200 Q 300 300 300 350" />
+        <path class="road" d="M 300 350 Q 220 320 165 290" />
+        <path class="road" d="M 300 350 Q 380 320 445 290" />
+        <path class="road" d="M 300 350 Q 230 420 175 470" />
+        <path class="road" d="M 300 350 Q 420 460 500 560" />
+
+        <!-- castle landmark (non-clickable) -->
+        <g>
+          <rect x="255" y="110" width="90" height="60" fill="#8a7a56" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="245" y="90" width="20" height="30" fill="#8a7a56" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="335" y="90" width="20" height="30" fill="#8a7a56" stroke="var(--ink)" stroke-width="2"/>
+          <polygon points="245,90 255,72 265,90" fill="#8a7a56" stroke="var(--ink)" stroke-width="2"/>
+          <polygon points="335,90 345,72 355,90" fill="#8a7a56" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="292" y="135" width="16" height="35" fill="var(--ink)"/>
+          <text class="landmark-label" x="300" y="192">THE CHANCELLERY KEEP</text>
+        </g>
+
+        <!-- market square (center, clickable) -->
+        <a xlink:href="chartered-realm-market-tavern.html" class="pin">
+          <circle class="pin-dot" cx="300" cy="350" r="17"/>
+          <path d="M 291 350 L 309 350 M 300 341 L 300 359" stroke="var(--ink)" stroke-width="2"/>
+          <text class="pin-label" x="300" y="385">MARKET &amp; TAVERN</text>
+        </a>
+
+        <!-- library (left, clickable) -->
+        <a xlink:href="chartered-realm-archive-part1.html" class="pin">
+          <circle class="pin-dot" cx="165" cy="290" r="17"/>
+          <rect x="157" y="282" width="16" height="12" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+          <line x1="165" y1="282" x2="165" y2="294" stroke="var(--ink)" stroke-width="1.5"/>
+          <text class="pin-label" x="165" y="325">THE LIBRARY</text>
+        </a>
+
+        <!-- shrine (right, clickable) -->
+        <a xlink:href="chartered-realm-shrine.html" class="pin">
+          <circle class="pin-dot" cx="445" cy="290" r="17"/>
+          <polygon points="445,281 452,291 438,291" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+          <line x1="445" y1="291" x2="445" y2="297" stroke="var(--ink)" stroke-width="1.5"/>
+          <text class="pin-label" x="445" y="325">THE SHRINE</text>
+        </a>
+
+        <!-- guard post (lower left, clickable) -->
+        <a xlink:href="chartered-realm-guardpost.html" class="pin">
+          <circle class="pin-dot" cx="175" cy="470" r="17"/>
+          <polygon points="175,461 183,466 183,477 175,482 167,477 167,466" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+          <text class="pin-label" x="175" y="505">GUARD POST</text>
+        </a>
+
+        <!-- ruins (far corner, clickable) -->
+        <a xlink:href="chartered-realm-ruins.html" class="pin">
+          <circle class="pin-dot" cx="500" cy="560" r="17"/>
+          <path d="M 493 568 L 496 550 L 502 555 L 507 546" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+          <text class="pin-label" x="500" y="595">THE RUIN</text>
+        </a>
+      </svg>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-list">
+      <a class="legend-item" href="chartered-realm-archive-part1.html">
+        <span class="legend-num">1</span>
+        <span class="legend-text">
+          <div class="legend-name">The Library</div>
+          <div class="legend-desc">Documented history. What can be checked and footnoted.</div>
+        </span>
+        <span class="legend-arrow">→</span>
+      </a>
+      <a class="legend-item" href="chartered-realm-shrine.html">
+        <span class="legend-num">2</span>
+        <span class="legend-text">
+          <div class="legend-name">The Shrine</div>
+          <div class="legend-desc">The Great Ledger, and an audience with the Priestess.</div>
+        </span>
+        <span class="legend-arrow">→</span>
+      </a>
+      <a class="legend-item" href="chartered-realm-market-tavern.html">
+        <span class="legend-num">3</span>
+        <span class="legend-text">
+          <div class="legend-name">The Market &amp; The Salted Rope</div>
+          <div class="legend-desc">Daily life, stalls, a menu, and the rumors at the bar.</div>
+        </span>
+        <span class="legend-arrow">→</span>
+      </a>
+      <a class="legend-item" href="chartered-realm-guardpost.html">
+        <span class="legend-num">4</span>
+        <span class="legend-text">
+          <div class="legend-name">Guard Post</div>
+          <div class="legend-desc">The notice board. Proclamations, wanted posters, sealed files.</div>
+        </span>
+        <span class="legend-arrow">→</span>
+      </a>
+      <a class="legend-item" href="chartered-realm-ruins.html">
+        <span class="legend-num">5</span>
+        <span class="legend-text">
+          <div class="legend-name">The Ruin on the Old Road</div>
+          <div class="legend-desc">A dormant relay tower. Best visited last.</div>
+        </span>
+        <span class="legend-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

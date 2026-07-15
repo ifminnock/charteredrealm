@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Great Ledger — Shrine of the Unbroken Chain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* shell / shrine niche */
+  --leather:#241309;
+  --leather-edge:#160b05;
+
+  /* page surface */
+  --vellum:#ecdfc0;
+  --vellum-shadow:#ddcb9c;
+  --vellum-deep:#cdb98c;
+
+  /* ink */
+  --ink:#2e2013;
+  --ink-muted:#5e4a34;
+  --ink-faint:#8a7355;
+
+  /* functional accents */
+  --gold:#93701f;
+  --gold-bright:#b98f2f;
+  --veil:#4a3550;
+  --veil-bright:#63466b;
+
+  /* structure */
+  --line:#b9a06a;
+  --line-soft:#cdb98c;
+
+  --font-cere:'Cinzel', 'Times New Roman', serif;
+  --font-cere-deco:'Cinzel Decorative', 'Cinzel', serif;
+  --font-read:'EB Garamond', Georgia, serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--leather-edge);
+  font-family:var(--font-read);
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+/* ===== SHRINE SHELL ===== */
+.shrine{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:
+    radial-gradient(ellipse at 50% 0%, #3a2412 0%, var(--leather) 55%, var(--leather-edge) 100%);
+}
+.niche-label{
+  font-family:var(--font-cere);
+  font-size:9.5px;
+  letter-spacing:0.16em;
+  color:#a9895a;
+  text-align:center;
+  padding:10px 14px 5px;
+  text-transform:uppercase;
+}
+.book-frame{
+  position:relative;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  margin:0 10px 10px;
+  border-radius:3px;
+  overflow:hidden;
+  box-shadow:
+    inset 0 0 0 1px #0a0500,
+    inset 0 0 40px rgba(0,0,0,0.35),
+    0 8px 24px rgba(0,0,0,0.6);
+  background:var(--vellum);
+  border:1px solid #4a2f16;
+}
+/* subtle vellum grain */
+.book-frame::before{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:50;
+  opacity:0.5;
+  background:
+    repeating-linear-gradient(115deg, rgba(139,115,85,0.035) 0px, rgba(139,115,85,0.035) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode:multiply;
+}
+/* aged vignette on page edges */
+.book-frame::after{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:49;
+  box-shadow: inset 0 0 60px 10px rgba(80,58,30,0.28);
+}
+
+/* ===== CANDLE STATUS STRIP ===== */
+.candle-bar{
+  background:var(--ink);
+  color:#c9b98c;
+  font-family:var(--font-cere);
+  font-size:9.5px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.candle-left{display:flex;align-items:center;gap:7px;}
+.flame{
+  width:6px;height:9px;border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  background:var(--gold-bright);
+  box-shadow:0 0 5px 1px rgba(185,143,47,0.7);
+  animation:flicker 2.8s infinite ease-in-out;
+  flex-shrink:0;
+}
+@keyframes flicker{
+  0%,100%{opacity:1; transform:scaleY(1);}
+  30%{opacity:0.75; transform:scaleY(0.92) translateX(0.5px);}
+  55%{opacity:0.9; transform:scaleY(1.05);}
+  80%{opacity:0.6; transform:scaleY(0.85) translateX(-0.5px);}
+}
+.candle-right{color:#8a7355;font-size:9px;}
+
+/* ===== MODE TABS (wax-seal style) ===== */
+.mode-tabs{
+  display:flex;
+  background:var(--vellum-deep);
+  border-bottom:1px solid var(--line);
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.mode-tab{
+  flex:1;
+  padding:13px 6px;
+  text-align:center;
+  font-family:var(--font-cere);
+  font-size:10.5px;
+  letter-spacing:0.09em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  background:none;
+  border:none;
+  border-bottom:3px solid transparent;
+  cursor:pointer;
+}
+.mode-tab.active{
+  color:var(--ink);
+  border-bottom-color:var(--gold);
+  background:var(--vellum);
+  font-weight:600;
+}
+
+/* ===== CHAPTER RIBBON NAV ===== */
+.chapter-nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:11px 10px;
+  background:var(--vellum-deep);
+  border-bottom:1px solid var(--line-soft);
+  flex-shrink:0;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+  z-index:2;
+}
+.chapter-nav::-webkit-scrollbar{display:none;}
+.ribbon{
+  flex-shrink:0;
+  font-family:var(--font-cere);
+  font-size:10px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  background:var(--vellum);
+  border:1px solid var(--line);
+  border-radius:1px;
+  padding:8px 11px;
+  cursor:pointer;
+  white-space:nowrap;
+  position:relative;
+}
+.ribbon.active{
+  background:var(--gold);
+  color:var(--vellum);
+  border-color:var(--gold);
+}
+
+/* ===== PAGE CONTENT ===== */
+.page{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:20px 18px 44px;
+  position:relative;
+  z-index:2;
+  min-height:0;
+}
+
+.eyebrow{
+  font-family:var(--font-cere);
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin:0 0 6px;
+}
+h1.book-title{
+  font-family:var(--font-cere);
+  font-size:23px;
+  font-weight:700;
+  margin:0 0 14px;
+  line-height:1.3;
+  border-bottom:2px solid var(--line);
+  padding-bottom:11px;
+  letter-spacing:0.01em;
+}
+h2.verse-title{
+  font-family:var(--font-cere);
+  font-size:16px;
+  font-weight:600;
+  letter-spacing:0.03em;
+  margin:26px 0 10px;
+  color:var(--ink);
+}
+h2.verse-title:first-of-type{margin-top:6px;}
+
+p{
+  font-size:17px;
+  line-height:1.8;
+  margin:0 0 14px;
+  max-width:66ch;
+}
+.verse-body p:first-of-type{
+  margin-top:0;
+}
+.verse-body p:first-of-type::first-letter{
+  font-family:var(--font-cere-deco);
+  font-size:3.1em;
+  float:left;
+  line-height:0.78;
+  padding:0.04em 0.08em 0 0;
+  color:var(--gold);
+  font-weight:700;
+}
+strong{color:var(--ink); font-weight:600;}
+em{color:var(--ink-muted);}
+
+.lede{
+  font-size:16px;
+  line-height:1.8;
+  color:var(--ink-muted);
+  font-style:italic;
+  margin-bottom:18px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--line-soft);
+}
+
+/* ===== ORNAMENT DIVIDER ===== */
+.ornament{
+  text-align:center;
+  color:var(--gold);
+  font-size:13px;
+  letter-spacing:0.4em;
+  margin:22px 0;
+  opacity:0.7;
+}
+
+/* ===== VEILED / WHISPERED CALLOUT ===== */
+.veiled{
+  background:var(--vellum-deep);
+  border-left:3px solid var(--veil);
+  border-radius:1px;
+  padding:14px 16px;
+  margin:16px 0;
+  font-size:15.5px;
+  line-height:1.7;
+  font-style:italic;
+  color:var(--ink-muted);
+}
+.veiled-label{
+  font-family:var(--font-cere);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--veil-bright);
+  margin-bottom:6px;
+  font-style:normal;
+  display:block;
+}
+
+.torn{
+  background:repeating-linear-gradient(135deg, var(--vellum-deep) 0px, var(--vellum-deep) 6px, var(--vellum-shadow) 6px, var(--vellum-shadow) 7px);
+  border:1px dashed var(--ink-faint);
+  padding:14px 16px;
+  margin:16px 0;
+  font-size:15px;
+  line-height:1.7;
+  color:var(--ink-muted);
+  font-style:italic;
+}
+
+/* ===== PRIESTESS MODE ===== */
+.priestess-scene{
+  padding-bottom:8px;
+}
+.priestess-portrait{
+  border:1px solid var(--line);
+  background:var(--vellum-deep);
+  padding:16px;
+  margin-bottom:18px;
+  font-size:15px;
+  line-height:1.75;
+  font-style:italic;
+  color:var(--ink-muted);
+  border-radius:1px;
+}
+.q-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  margin-bottom:10px;
+}
+.q-card{
+  background:var(--vellum);
+  border:1px solid var(--line);
+  border-radius:1px;
+  padding:13px 14px;
+  cursor:pointer;
+  font-family:var(--font-read);
+  font-size:15.5px;
+  color:var(--ink);
+  text-align:left;
+  transition:background 0.15s;
+}
+.q-card:active{background:var(--vellum-deep);}
+.q-card.asked{
+  opacity:0.55;
+  border-style:dashed;
+  cursor:default;
+}
+.q-card .qmark{
+  font-family:var(--font-cere);
+  color:var(--gold);
+  margin-right:8px;
+  font-size:12px;
+}
+
+.answer-block{
+  background:var(--vellum-deep);
+  border-left:3px solid var(--gold);
+  border-radius:1px;
+  padding:15px 16px;
+  margin:14px 0 18px;
+  font-size:16px;
+  line-height:1.75;
+  font-style:italic;
+}
+.answer-src{
+  display:block;
+  margin-top:9px;
+  font-family:var(--font-cere);
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  font-style:normal;
+}
+
+.audience-counter{
+  font-family:var(--font-cere);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  text-align:center;
+  margin:6px 0 16px;
+}
+
+.cutoff-scene{
+  text-align:center;
+  padding:28px 10px 10px;
+}
+.cutoff-scene .glyph{
+  font-size:26px;
+  color:var(--veil-bright);
+  margin-bottom:14px;
+  display:block;
+}
+.cutoff-scene p{
+  max-width:none;
+  margin:0 auto 10px;
+}
+.btn-return{
+  display:inline-block;
+  margin-top:12px;
+  background:var(--veil);
+  color:var(--vellum);
+  border:none;
+  padding:11px 20px;
+  font-family:var(--font-cere);
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  cursor:pointer;
+  border-radius:1px;
+}
+.btn-return:active{background:var(--veil-bright);}
+
+/* ===== SCROLLBAR ===== */
+.page::-webkit-scrollbar{width:5px;}
+.page::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px;}
+
+@media (max-width:380px){
+  h1.book-title{font-size:20px;}
+  p, .lede{font-size:16px;}
+}
+</style>
+</head>
+<body>
+<a href="chartered-realm-map.html" style="position:fixed;top:8px;left:8px;z-index:999;background:rgba(0,0,0,0.6);color:#ecdfc0;font-family:monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:3px;text-decoration:none;border:1px solid rgba(255,255,255,0.25);">&#8592; Map</a>
+
+<div class="shrine">
+  <div class="niche-label">SHRINE OF THE UNBROKEN CHAIN · THE GREAT LEDGER LIES OPEN HERE</div>
+
+  <div class="book-frame">
+    <div class="candle-bar">
+      <div class="candle-left">
+        <span class="flame"></span>
+        <span>THE LEDGER IS UNATTENDED, AS ALWAYS</span>
+      </div>
+      <div class="candle-right" id="candleRight">FOLIO UNKNOWN</div>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="read">Read the Ledger</button>
+      <button class="mode-tab" data-mode="priestess">Speak with the Priestess</button>
+    </div>
+
+    <div class="chapter-nav" id="chapterNav"></div>
+
+    <div class="page" id="page"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA: THE GREAT LEDGER
+   ============================================================ */
+const BOOK = [
+  {
+    id:"opening",
+    title:"How This Ledger Came to Be Read",
+    verses:[
+      {
+        heading:null,
+        lede:"Set down by hands unrecorded, kept by a line of keepers who took no names of their own once they entered this service.",
+        body:`
+          <p>The Great Ledger is not a history. The Library across the square keeps histories, and the Library will tell you so itself, plainly, the way it tells everyone everything: dates, sources, disagreements footnoted and left unresolved. That is not what is bound in the cover you are looking at now.</p>
+          <p>This book was not written to be checked. It was written to be believed, or doubted, or wept over, by people who needed something truer than a date. It tells you what the Compact meant, not merely when it fell. It tells you what waits in the dark behind the Severance, not merely that something is missing from the record. Where the Library says <em>unknown</em>, the Ledger says a name in a language it will not quite let you read.</p>
+          <p>The Priestess keeps this shrine. She does not read from the Ledger aloud, and she will not explain every page you turn. Some of what is written here is meant to be carried unfinished. Turn the pages as far as you are called to, and no further than that.</p>
+        `
+      }
+    ]
+  },
+  {
+    id:"beginnings",
+    title:"The Book of Beginnings",
+    verses:[
+      {
+        heading:"Of the Elves, Who Remember Everything and Forgive Slowly",
+        lede:null,
+        body:`
+          <p>Before there was a Compact to build, there were the Elves, and the Elves already knew how to make a thing that would outlast the hand that made it. This, the Ledger says, was their first gift and their oldest sorrow: to build for centuries is to watch centuries pass, and to watch is not the same as to forget.</p>
+          <p>It is written that the first Elf to shape stone did so not for beauty but for patience — a wall raised slowly, checked at every course, so that whoever stood on it in four hundred years would trust it without knowing why. The Elves called this <em>keeping faith with the unborn</em>. It is the reason, the Ledger says, that an Elf's grief lasts longer than a human lifetime and their trust is harder to earn than either: they have simply had more time to be disappointed in people who build for a season and call it finished.</p>
+        `
+      },
+      {
+        heading:"Of the Dwarves, Who Trust the Record and Not the Word",
+        lede:null,
+        body:`
+          <p>The Dwarves, the Ledger says, were given a different gift: the certainty that a thing either happened or it did not, and that the ledger of it — the true ledger, not this one — cannot be argued with once it is properly kept. Where an Elf remembers, a Dwarf checks. This is not coldness. It is written as the opposite of coldness: an audit is how a Dwarf says <em>I care enough about this to make sure it was true.</em></p>
+          <p>It is said the first Dwarf to keep a full and honest record did so after being lied to once, badly, by someone she loved, and swore that no ledger of hers would ever again be a matter of trust rather than proof. Her descendants have kept that oath for longer than any kingdom above ground has kept a promise. This is offered without judgment. It is simply offered.</p>
+        `
+      },
+      {
+        heading:"Of the Orcs, Who Owe the Land and Are Owed By It",
+        lede:null,
+        body:`
+          <p>Before there were treaties to break, there were the Orcs, and the Orcs are recorded here as the people who never needed a Compact to know how to keep one. Their word to their own clan has never required a witness. It is written that an Orc who breaks faith with kin is not punished by the clan; they are simply no longer spoken to, by anyone, ever again, and this is considered a harsher sentence than death.</p>
+          <p>The Ledger is careful here, more careful than it is almost anywhere else, to say plainly: the Orcs' quarrel with Cornerstone is not a mystery, and it is not the Orcs who broke something first. What is owed, is owed. The Ledger does not pretend otherwise, even where the Chancellery down the hill would prefer it did.</p>
+        `
+      },
+      {
+        heading:"Of Humankind, Who Were Given the Hardest Gift of All",
+        lede:null,
+        body:`
+          <p>Last of all came Humankind, and Humankind was given no craft that would outlast the ages, no unbreakable record, no unbroken word. What Humankind was given instead was stranger and, the Ledger insists, harder to carry: the ability to hold three other peoples' gifts in one hand at once and make them work together on purpose.</p>
+          <p>It is written that in the earliest days this gift had no name, and so the first who carried it gave it names as they discovered its parts, the way a child names each finger before understanding the hand. They called the first part the <strong>Charter</strong>: the plain naming, spoken aloud before any stone was laid, of what was being built and who it was for, so that no one could later claim they hadn't understood. They called the second part the <strong>Reckoning of Risk</strong>: the discipline of naming, before the work began, every way it might yet fail, not from fear but from respect for the work. They called the third the <strong>Keeping of the Milestone</strong>: small, honest markers driven into long efforts, so that a people could tell truthfully whether they were succeeding or merely busy.</p>
+          <p>And they called the last and hardest part the <strong>Sponsor's Blessing</strong>, which is not a King's blessing and never was: it is the harder thing, freely given trust from someone with the power to stop the work, that the work is worth finishing. The Ledger says plainly that this was always the rarest gift of the four, rarer than any craft of stone or any audited ledger, because it required someone with power to risk being wrong in public. It says, too, that this is the gift Cornerstone has had the least practice giving back to anyone, before or since.</p>
+          <div class="veiled">
+            <span class="veiled-label">Marginal Note, Hand Unknown</span>
+            A Coordinator is not a ruler and was never meant to become one. A Coordinator is the one who remembers, out loud, on behalf of everyone too busy building to remember it themselves, what all of this was for in the first place.
+          </div>
+        `
+      }
+    ]
+  },
+  {
+    id:"golden-age",
+    title:"The Book of the Golden Age",
+    verses:[
+      {
+        heading:"The Raising of the Chain",
+        lede:"Of the century when four gifts became one, and the Realm briefly worked the way it was meant to.",
+        body:`
+          <p>When the four peoples finally built together rather than merely beside one another, the Ledger says the Realm did something it had never done before and has not managed since: it made a promise across a distance and kept it without anyone standing there to enforce it.</p>
+          <p>The Concord Chain, tower answering tower from one horizon to the next, was not raised by any single people, and the Ledger is emphatic that this is the whole point of the story, not an incidental detail. Elven hands cut the resonance-crystal to hold a thought without losing its shape over a hundred miles. Dwarven hands built the housing to run for a thousand years without needing to be believed, only checked. And it was human hands, the Ledger says, that decided what the Chain was <em>for</em>: not conquest, not tribute, but the plain, unglamorous work of making sure that a promise made in one valley could be trusted in the next one over.</p>
+          <p>It is written that in the Long Noon, as this age came to be called, a farmer's grievance in the furthest valley could reach a magistrate's ear inside a single day, and be answered inside two. This is offered by the Ledger not as a fairy tale of perfect justice — it says plainly that Cornerstone's magistrates were still often wrong, still often slow, still often unfair — but as proof of a much smaller and much rarer thing: that the mechanism for being reached at all still worked, reliably, for everyone, for a hundred years.</p>
+        `
+      },
+      {
+        heading:"The Long Noon",
+        lede:null,
+        body:`
+          <p>The Ledger lingers here, more than anywhere else in its pages, on the ordinary texture of that century, as if determined that no reader mistake the Golden Age for a myth about kings and battles. It describes market stalls where a rune-forged plow stood beside a device of dwarven gears doing the same work twice as fast, and no one thought this strange, because both were simply tools a coordinated people had agreed were worth building.</p>
+          <p>It describes apprenticeships that crossed peoples freely: human children learning the discipline of the audit from dwarven masters, elven artisans taking human journeymen because a human's gift for naming a problem plainly was, even the Elves admitted, useful in a workshop. It describes the Chain-towers themselves as ordinary as a well: not temples, not wonders paraded before crowds, simply the way a message got from here to there, the way water got from a river to a cup.</p>
+          <div class="ornament">✦ ✦ ✦</div>
+          <p>This is the part of the Ledger the Priestess is most often asked to explain, and the part she is least willing to. Not because it is secret. Because, she says, it is the plainest page in the whole book, and everyone who reads it wants it to be more complicated than it is: <em>they simply worked together, on purpose, for a hundred years, and it was enough.</em></p>
+        `
+      }
+    ]
+  },
+  {
+    id:"unbinding",
+    title:"The Book of the Unbinding",
+    verses:[
+      {
+        heading:"The Night the Towers Went Quiet",
+        lede:"Written in a hand the archive attributes to the third generation after the Severance, when the wound was still recent enough to be spoken of directly.",
+        body:`
+          <p>The Ledger does not soften this the way the Chancellery's civic record does. It does not call it an accident, and it will not call it, as some old sermons still do, an act of the peoples against one another. It says: something came for the thread itself, on a single night, in every tower at once, and it did not need a human traitor at every gate to do it. It needed only one.</p>
+          <p>It is written that in the valleys farthest from Cornerstone, keepers felt their tower's light go out before any rider could have carried news of a betrayal a hundred miles away. This detail is repeated three times across three different marginal hands, as if each successive keeper of the Ledger needed to confirm it had truly been written down and was not merely a story the shrine told itself. Whatever this was, distance did not slow it down. It did not need to travel. It was already everywhere the Chain reached, waiting.</p>
+        `
+      },
+      {
+        heading:"The Adversary Who Has No Name",
+        lede:null,
+        body:`
+          <p>The priesthood has never agreed on what to call it, and the Ledger records this disagreement rather than resolving it, which the Priestess considers, of everything in these pages, the most honest thing the book does. Some call it the Unmaking. Some, in the oldest liturgies, will not name it at all, and simply gesture at the space where a name would go, the way you'd gesture at a wound rather than describe it.</p>
+          <p>What the Ledger insists on, across every hand that has added to it, is what the Adversary is <em>not</em>. It is not a conqueror; it took no land. It is not a plague; it killed almost no one directly. It is not, whatever the frightened sermons of later centuries have claimed, an enemy of any single people. It came for the space between people, the part that isn't Elf or Dwarf or Orc or Human, the part that only exists when two or more of them are trying, in good faith, to keep a promise to each other. That is what went missing. That is what has not come back.</p>
+          <div class="torn">
+            "...found it easiest to enter through a closed door, a room where a decision was being delayed rather than made, a meeting called about another meeting. It did not break anything that night that was not already being left to break on its own. It only made sure the breaking would never be undone." <br>— fragment, provenance disputed, catalogued alongside three near-identical copies from unrelated centuries
+          </div>
+        `
+      },
+      {
+        heading:"What Is Owed",
+        lede:null,
+        body:`
+          <p>The Ledger's harshest pages are reserved not for the Adversary but for Cornerstone itself, and the Priestess will tell anyone who asks that this is deliberate. It is easier, the book says, to grieve a monster than to sit with a failure that was partly your own people's doing, and the Ledger refuses to let its readers take the easier path.</p>
+          <p>It says the Elves were not wrong to leave, and does not ask them to return out of pity. It says the Dwarves' audit found what it found, and a true finding is not owed an apology, only a correction. It says the debt to the Orcs did not end at the Severance; unmanaged encroachment continued for seven centuries afterward, without a Chain to carry any warning of it, without any coordinated hand slowing it down, and that this is a wound the Realm opened on itself long after the original night was over, one that a returned gift of coordination would still be obligated to close.</p>
+        `
+      }
+    ]
+  },
+  {
+    id:"second-coming",
+    title:"The Book of the Second Coming",
+    verses:[
+      {
+        heading:"The Promise",
+        lede:"The newest hand in the Ledger, added within living memory, and the only chapter the Priestess reads with anything like hope in her voice.",
+        body:`
+          <p>Every other chapter of this book looks backward. This one does not, and the Ledger is careful to mark the difference: everything before this page is a record of what was lost. This page is a claim about what has not finished happening yet.</p>
+          <p>It is written, in more than one hand, across more than one century, that the gift Humankind carried in the Golden Age did not die with the Severance. It was taken, or hidden, or sealed — the Ledger uses all three words in different places and refuses to choose between them — but taken and hidden things can, in principle, be found. The oldest liturgies of this shrine are built around a single promise, repeated at every ceremony whether or not the congregation still believes it: <em>the thread was not destroyed. It was only let go of. What was let go of can be taken up again, by hands willing to hold it.</em></p>
+        `
+      },
+      {
+        heading:"Signs of the Return",
+        lede:null,
+        body:`
+          <p>The Ledger is unusually specific, for a prophecy, about what the return will look like, and unusually humble about what it will not look like. It will not arrive as an army. It will not arrive as a king. It says the gift will return the way it was first given: quietly, in ordinary hands, in people who name a problem plainly when everyone else is finding reasons to delay, who hold a promise steady across a distance without needing to be watched, who can carry more than one people's strengths in one hand and make them work together on purpose.</p>
+          <p>It says such hands are rare, and always have been, even in the Golden Age. It does not say they are gone. It says, in the plainest line the whole book allows itself: <strong>look for them before you assume there are none left to find.</strong></p>
+          <div class="ornament">✦ ✦ ✦</div>
+          <p>The Priestess keeps a single candle lit before this final page, day and night, and has for as long as the shrine has kept a record of its own keepers. She has never explained why, except once, to a child who asked her directly. She said only: <em>because the book asks me to, and because it has been wrong about less than you'd think.</em></p>
+        `
+      }
+    ]
+  }
+];
+
+/* ============================================================
+   DATA: THE PRIESTESS
+   ============================================================ */
+const PRIESTESS_INTRO = `She does not look up when you enter. She is bent over a lectern at the side of the shrine, copying something from one worn page to a newer one, in a hand steadier than her age would suggest. She will answer if you speak first. She will not offer more than you ask for, and she keeps her own accounting of how long she is willing to be interrupted.`;
+
+const QUESTIONS = [
+  {
+    q:"What do you do here, exactly?",
+    a:"I copy the Ledger before the old pages crumble past saving, and I read it enough that I no longer need the page in front of me to know what it says. Someone has done this since before my grandmother's grandmother. I will not be the one who lets it stop."
+  },
+  {
+    q:"Do you know the Adversary's true name?",
+    a:"I know a name for it. I do not know if it is the name, or only the one my order settled on because a shrine cannot run its ceremonies around a blank space forever. Ask me again after the work at hand has actually reached that door, and I may tell you what I have. Not before."
+  },
+  {
+    q:"Will the Concord Chain wake again?",
+    a:"Every generation, someone tries a tower, and every generation, the tower takes the work, holds it a moment, and goes quiet again. I don't believe that means it cannot be done. I believe it means it has never been attempted by the right hands, in the right order, for the right reason. The Ledger seems to agree with me, for whatever a book's opinion is worth."
+  },
+  {
+    q:"Why do only some people still carry the old gift?",
+    a:"I have asked the book that question more than any other and gotten the same answer every time, which I have come to trust precisely because it never changes: it was never given to everyone, even in the Golden Age. It was rare then. It is rare now. Rare is not the same as gone."
+  },
+  {
+    q:"Is the King's bloodline truly blessed?",
+    a:"That is a Chancellery word, not a shrine word, and I'd ask you to notice the difference yourself rather than have me say it plainly and get myself in trouble with the guard outside. The Ledger has a great deal to say about earned trust and very little to say about inherited thrones. Draw your own line between those two facts."
+  },
+  {
+    q:"What must someone do to hasten the Second Coming?",
+    a:"The book is maddeningly unhelpful on method and quite firm on temperament. Name the problem plainly. Keep a promise across a distance without needing to be watched. Hold more than one kind of strength in one hand and make it work together on purpose. If that sounds less like a ritual and more like a description of a person, I think that is rather the point."
+  },
+  {
+    q:"Why did the Library's account of the Severance differ from yours?",
+    a:"Because the Library keeps what can be checked, and I keep what needs to be believed to be useful at all. I don't think either of us is lying. I think we are doing two different jobs, and the truth of that night was always too large to fit inside just one of them."
+  }
+];
+
+const AUDIENCE_LIMIT = 3;
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let mode = "read";
+let chapterId = BOOK[0].id;
+let askedThisAudience = [];
+let audienceOver = false;
+
+/* ============================================================
+   RENDER: READ MODE
+   ============================================================ */
+function renderChapterNav(){
+  const nav = document.getElementById('chapterNav');
+  nav.innerHTML = BOOK.map(ch =>
+    `<div class="ribbon ${ch.id===chapterId?'active':''}" data-id="${ch.id}">${ch.title}</div>`
+  ).join('');
+  nav.querySelectorAll('.ribbon').forEach(r=>{
+    r.addEventListener('click', ()=>{
+      chapterId = r.dataset.id;
+      renderChapterNav();
+      renderPage();
+      document.getElementById('page').scrollTop = 0;
+    });
+  });
+}
+
+function renderPage(){
+  const page = document.getElementById('page');
+  const ch = BOOK.find(c=>c.id===chapterId);
+  document.getElementById('candleRight').textContent = ch.title.toUpperCase();
+
+  let html = `<div class="eyebrow">The Great Ledger</div><h1 class="book-title">${ch.title}</h1>`;
+  ch.verses.forEach((v,i)=>{
+    html += `<div class="verse-body">`;
+    if(v.heading) html += `<h2 class="verse-title">${v.heading}</h2>`;
+    if(v.lede) html += `<p class="lede">${v.lede}</p>`;
+    html += v.body;
+    html += `</div>`;
+    if(i < ch.verses.length - 1) html += `<div class="ornament">❦</div>`;
+  });
+  page.innerHTML = html;
+}
+
+/* ============================================================
+   RENDER: PRIESTESS MODE
+   ============================================================ */
+function renderPriestess(){
+  const page = document.getElementById('page');
+  document.getElementById('candleRight').textContent = 'AN AUDIENCE';
+
+  if(audienceOver){
+    page.innerHTML = `
+      <div class="eyebrow">The Priestess</div>
+      <h1 class="book-title">The Audience Is Over</h1>
+      <div class="cutoff-scene">
+        <span class="glyph">✦</span>
+        <p>She sets down her pen before you've finished the question, not unkindly, and shakes her head once.</p>
+        <p><em>"That's enough for today. The work doesn't copy itself, and I've given you what I can spare."</em></p>
+        <p>She turns back to the lectern, and does not look up again. <strong>Return at the next ceremony to learn more.</strong></p>
+        <button class="btn-return" id="btnReturn">Return at the Next Ceremony</button>
+      </div>
+    `;
+    document.getElementById('btnReturn').addEventListener('click', ()=>{
+      askedThisAudience = [];
+      audienceOver = false;
+      renderPriestess();
+    });
+    return;
+  }
+
+  let html = `
+    <div class="eyebrow">The Priestess</div>
+    <h1 class="book-title">Speak with the Priestess</h1>
+    <div class="priestess-portrait">${PRIESTESS_INTRO}</div>
+    <div class="audience-counter">${AUDIENCE_LIMIT - askedThisAudience.length} question${AUDIENCE_LIMIT - askedThisAudience.length === 1 ? '' : 's'} left in this audience</div>
+    <div class="q-list" id="qList"></div>
+    <div id="answerArea"></div>
+  `;
+  page.innerHTML = html;
+
+  const qList = document.getElementById('qList');
+  qList.innerHTML = QUESTIONS.map((item,idx)=>{
+    const asked = askedThisAudience.includes(idx);
+    return `<div class="q-card ${asked?'asked':''}" data-idx="${idx}"><span class="qmark">▸</span>${item.q}</div>`;
+  }).join('');
+
+  qList.querySelectorAll('.q-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const idx = parseInt(card.dataset.idx);
+      if(askedThisAudience.includes(idx)) return;
+
+      if(askedThisAudience.length >= AUDIENCE_LIMIT){
+        audienceOver = true;
+        renderPriestess();
+        return;
+      }
+
+      askedThisAudience.push(idx);
+
+      if(askedThisAudience.length >= AUDIENCE_LIMIT){
+        renderPriestess();
+        setTimeout(()=>{ audienceOver = true; renderPriestess(); }, 2200);
+      } else {
+        renderPriestess();
+      }
+    });
+  });
+
+  rebuildAnswerHistory();
+}
+
+function rebuildAnswerHistory(){
+  const answerArea = document.getElementById('answerArea');
+  if(!answerArea) return;
+  answerArea.innerHTML = askedThisAudience.slice().reverse().map(idx => `
+    <div class="answer-block">
+      "${QUESTIONS[idx].a}"
+      <span class="answer-src">The Priestess</span>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   MODE SWITCH / INIT
+   ============================================================ */
+function setMode(newMode){
+  mode = newMode;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===mode));
+  document.getElementById('chapterNav').style.display = mode==='read' ? 'flex' : 'none';
+
+  if(mode === 'read'){
+    renderChapterNav();
+    renderPage();
+  } else {
+    renderPriestess();
+  }
+  document.getElementById('page').scrollTop = 0;
+}
+
+document.querySelectorAll('.mode-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=> setMode(tab.dataset.mode));
+});
+
+renderChapterNav();
+renderPage();
+</script>
+</body>
+</html>

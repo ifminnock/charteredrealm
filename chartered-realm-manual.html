@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Chartered Realm — Field Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --shell:#151209;
+  --shell-edge:#0d0b06;
+  --panel:#d6cca8;
+  --panel-recessed:#c2b78e;
+  --panel-deep:#b3a67a;
+  --ink:#2b2618;
+  --ink-muted:#5f5842;
+  --ink-faint:#8a7f60;
+  --amber:#8a5a1e;
+  --amber-bright:#b3792a;
+  --rust:#7c3b30;
+  --rust-bright:#9c4a3c;
+  --line:#a89a6e;
+  --line-soft:#bcb185;
+  --font-system:'Space Mono', ui-monospace, 'Courier New', monospace;
+  --font-reading:'Source Serif 4', Georgia, serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--shell-edge);
+  font-family:var(--font-reading);
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+/* ===== SHELL ===== */
+.device{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:var(--shell);
+}
+.bezel-label{
+  font-family:var(--font-system);
+  font-size:9px;
+  letter-spacing:0.14em;
+  color:#7a715a;
+  text-align:center;
+  padding:8px 0 4px;
+  text-transform:uppercase;
+}
+.screen{
+  position:relative;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  margin:0 8px 8px;
+  border-radius:6px;
+  overflow:hidden;
+  box-shadow: inset 0 0 0 1px #000, 0 6px 18px rgba(0,0,0,0.5);
+  background:var(--panel);
+}
+.screen::before{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:50;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.028) 0px, rgba(0,0,0,0.028) 1px,
+    transparent 1px, transparent 3px
+  );
+  mix-blend-mode:multiply;
+}
+
+/* ===== STATUS BAR ===== */
+.status-bar{
+  background:var(--ink);
+  color:#c9bd94;
+  font-family:var(--font-system);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  flex-shrink:0;
+}
+.status-left{display:flex;align-items:center;gap:6px;}
+.dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--amber);
+  animation:blink 2.4s infinite;
+  flex-shrink:0;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.25;}}
+.status-right{color:#7a715a;font-size:9px;}
+
+/* ===== TOP MODE TABS ===== */
+.mode-tabs{
+  display:flex;
+  background:var(--panel-recessed);
+  border-bottom:1px solid var(--line);
+  flex-shrink:0;
+}
+.mode-tab{
+  flex:1;
+  padding:12px 6px;
+  text-align:center;
+  font-family:var(--font-system);
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  background:none;
+  border:none;
+  border-bottom:3px solid transparent;
+  cursor:pointer;
+}
+.mode-tab.active{
+  color:var(--ink);
+  border-bottom-color:var(--amber);
+  background:var(--panel);
+}
+
+/* ===== SECTION NAV (horizontal scroll pills) ===== */
+.section-nav{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding:10px 10px;
+  background:var(--panel-recessed);
+  border-bottom:1px solid var(--line-soft);
+  flex-shrink:0;
+  -webkit-overflow-scrolling:touch;
+}
+.section-nav::-webkit-scrollbar{display:none;}
+.nav-pill{
+  flex-shrink:0;
+  font-family:var(--font-system);
+  font-size:10px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:2px;
+  padding:7px 10px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.nav-pill.active{
+  background:var(--amber);
+  color:var(--panel);
+  border-color:var(--amber);
+}
+
+/* ===== CONTENT PANEL ===== */
+.content{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:16px 14px 40px;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.eyebrow{
+  font-family:var(--font-system);
+  font-size:10px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--amber);
+  margin:0 0 4px;
+}
+h1.page-title{
+  font-family:var(--font-reading);
+  font-size:22px;
+  font-weight:700;
+  margin:0 0 12px;
+  line-height:1.25;
+  border-bottom:2px solid var(--line);
+  padding-bottom:10px;
+}
+h2.sub-title{
+  font-family:var(--font-reading);
+  font-size:17px;
+  font-weight:700;
+  margin:22px 0 8px;
+  color:var(--ink);
+}
+h3.mini-title{
+  font-family:var(--font-system);
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  margin:16px 0 6px;
+}
+p{
+  font-size:15px;
+  line-height:1.7;
+  margin:0 0 12px;
+  max-width:68ch;
+}
+strong{color:var(--ink);}
+.lede{
+  font-size:15px;
+  line-height:1.75;
+  color:var(--ink-muted);
+  font-style:italic;
+  margin-bottom:16px;
+}
+
+/* ===== CALLOUTS (three tiers) ===== */
+.callout{
+  border-radius:2px;
+  padding:14px 14px;
+  margin:14px 0;
+  font-size:14px;
+  line-height:1.65;
+}
+.callout-label{
+  font-family:var(--font-system);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.callout.example{
+  background:#c7c19f;
+  border-left:3px solid #3D5A40;
+}
+.callout.example .callout-label{color:#3D5A40;}
+.callout.rule{
+  background:var(--panel-deep);
+  border-left:3px solid var(--amber);
+}
+.callout.rule .callout-label{color:var(--amber);}
+.callout.fragment{
+  background:#e4d9b8;
+  border-left:3px solid #8B6914;
+  font-style:italic;
+}
+.callout.fragment .callout-label{color:#8B6914;font-style:normal;}
+.callout.fragment .src{
+  display:block;
+  margin-top:8px;
+  font-style:normal;
+  font-family:var(--font-system);
+  font-size:10px;
+  letter-spacing:0.06em;
+  color:var(--ink-faint);
+  text-transform:uppercase;
+}
+
+/* ===== TABLES (rendered as stacked cards on mobile) ===== */
+.data-table{margin:12px 0 20px;}
+.data-row{
+  border:1px solid var(--line);
+  border-radius:2px;
+  background:var(--panel-recessed);
+  margin-bottom:8px;
+  overflow:hidden;
+}
+.data-row-head{
+  font-family:var(--font-system);
+  font-size:12px;
+  letter-spacing:0.04em;
+  font-weight:700;
+  background:var(--panel-deep);
+  padding:8px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+.data-row-head .tag{
+  font-family:var(--font-system);
+  font-size:9px;
+  letter-spacing:0.06em;
+  color:var(--panel);
+  background:var(--amber);
+  padding:2px 6px;
+  border-radius:2px;
+  white-space:nowrap;
+}
+.data-row-body{padding:10px 12px;}
+.data-field{margin-bottom:8px;}
+.data-field:last-child{margin-bottom:0;}
+.data-field .fk{
+  font-family:var(--font-system);
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  display:block;
+  margin-bottom:2px;
+}
+.data-field .fv{font-size:14px;line-height:1.55;}
+
+/* ===== simple two-col mini table ===== */
+.mini-table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:13px;}
+.mini-table th,.mini-table td{
+  border:1px solid var(--line);
+  padding:7px 8px;
+  text-align:left;
+  vertical-align:top;
+  line-height:1.45;
+}
+.mini-table th{
+  background:var(--panel-deep);
+  font-family:var(--font-system);
+  font-size:10px;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+}
+
+/* ===== dice pill ===== */
+.dice-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+.dice-pill{
+  font-family:var(--font-system);
+  font-size:12px;
+  background:var(--ink);
+  color:var(--panel);
+  padding:6px 10px;
+  border-radius:3px;
+}
+
+hr.rule-line{
+  border:none;
+  border-top:1px solid var(--line-soft);
+  margin:22px 0;
+}
+
+/* ===== CHARACTER BUILDER ===== */
+.progress-track{
+  display:flex;
+  gap:4px;
+  padding:10px 14px 0;
+  background:var(--panel-recessed);
+}
+.progress-dot{
+  flex:1;
+  height:4px;
+  background:var(--line);
+  border-radius:2px;
+}
+.progress-dot.done{background:var(--amber);}
+.progress-dot.current{background:var(--amber-bright);}
+.progress-label{
+  font-family:var(--font-system);
+  font-size:9px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  text-align:center;
+  padding:6px 14px 10px;
+  background:var(--panel-recessed);
+}
+
+.option-card{
+  border:1px solid var(--line);
+  border-radius:3px;
+  background:var(--panel-recessed);
+  padding:12px 14px;
+  margin-bottom:10px;
+  cursor:pointer;
+}
+.option-card.selected{
+  background:var(--panel-deep);
+  border-color:var(--amber);
+  border-width:2px;
+  padding:11px 13px;
+}
+.option-card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:8px;
+}
+.option-name{font-family:var(--font-reading);font-weight:700;font-size:16px;}
+.option-tag{
+  font-family:var(--font-system);
+  font-size:9px;
+  letter-spacing:0.06em;
+  color:var(--ink-faint);
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.option-effect{
+  font-family:var(--font-system);
+  font-size:11.5px;
+  color:var(--amber);
+  margin-top:6px;
+  line-height:1.5;
+}
+.option-card.selected .option-effect{color:var(--rust);}
+.option-desc{font-size:13.5px;line-height:1.55;margin-top:6px;color:var(--ink-muted);}
+.check-badge{
+  font-family:var(--font-system);
+  font-size:10px;
+  color:var(--panel);
+  background:var(--amber);
+  border-radius:50%;
+  width:18px;height:18px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+
+.trait-slot{margin-bottom:20px;}
+.trait-slot-title{
+  font-family:var(--font-system);
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ink-muted);
+  margin-bottom:8px;
+}
+.trait-choice-row{display:flex;gap:8px;}
+.trait-choice{
+  flex:1;
+  border:1px solid var(--line);
+  background:var(--panel-recessed);
+  border-radius:3px;
+  padding:12px 10px;
+  text-align:center;
+  cursor:pointer;
+}
+.trait-choice.selected{
+  background:var(--amber);
+  border-color:var(--amber);
+  color:var(--panel);
+}
+.trait-choice .tc-name{font-family:var(--font-reading);font-weight:700;font-size:14.5px;}
+.trait-choice .tc-desc{font-size:11.5px;margin-top:4px;line-height:1.4;}
+.trait-choice.selected .tc-desc{color:#f0e9d4;}
+
+textarea.concept-input, input.concept-input{
+  width:100%;
+  font-family:var(--font-reading);
+  font-size:15px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:3px;
+  background:var(--panel-recessed);
+  color:var(--ink);
+  resize:vertical;
+}
+textarea.concept-input{min-height:90px;}
+textarea.concept-input:focus, input.concept-input:focus{
+  outline:2px solid var(--amber);
+  outline-offset:1px;
+}
+
+.wizard-nav{
+  display:flex;
+  gap:10px;
+  padding:12px 14px calc(14px + env(safe-area-inset-bottom));
+  background:var(--panel-recessed);
+  border-top:1px solid var(--line);
+  flex-shrink:0;
+}
+.btn{
+  font-family:var(--font-system);
+  font-size:12px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  padding:13px 14px;
+  border-radius:3px;
+  border:1px solid var(--amber);
+  background:var(--amber);
+  color:var(--panel);
+  cursor:pointer;
+  flex:1;
+  text-align:center;
+}
+.btn.secondary{
+  background:transparent;
+  color:var(--ink);
+  border-color:var(--line);
+}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+.btn.full{flex:1 1 100%;}
+
+.persona-reveal{
+  text-align:center;
+  padding:20px 14px;
+  border:2px solid var(--amber);
+  border-radius:4px;
+  background:var(--panel-deep);
+  margin-bottom:16px;
+}
+.persona-scale{
+  font-family:var(--font-system);
+  font-size:10px;
+  letter-spacing:0.1em;
+  color:var(--ink-muted);
+  text-transform:uppercase;
+}
+.persona-name{
+  font-family:var(--font-reading);
+  font-size:26px;
+  font-weight:700;
+  margin:6px 0 2px;
+}
+.persona-nick{
+  font-family:var(--font-system);
+  font-size:12px;
+  color:var(--rust);
+  letter-spacing:0.04em;
+}
+.persona-code{
+  font-family:var(--font-system);
+  font-size:11px;
+  color:var(--ink-faint);
+  margin-top:8px;
+}
+
+.sheet{
+  border:1px solid var(--line);
+  border-radius:4px;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.sheet-section-head{
+  font-family:var(--font-system);
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  background:var(--ink);
+  color:var(--panel);
+  padding:8px 12px;
+}
+.sheet-section-body{
+  background:var(--panel);
+  padding:12px 14px;
+}
+.sheet-line{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:13.5px;}
+.sheet-line:last-child{border-bottom:none;}
+.sheet-line .sl-k{font-family:var(--font-system);font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.04em;flex-shrink:0;}
+.sheet-line .sl-v{text-align:right;font-weight:600;}
+.sheet-concept{font-style:italic;padding:4px 0;}
+
+.copy-toast{
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--ink);
+  color:var(--panel);
+  font-family:var(--font-system);
+  font-size:11px;
+  letter-spacing:0.06em;
+  padding:10px 16px;
+  border-radius:4px;
+  opacity:0;
+  transition:opacity 0.25s;
+  pointer-events:none;
+  z-index:200;
+  text-transform:uppercase;
+}
+.copy-toast.show{opacity:1;}
+
+.blank-notice{
+  font-family:var(--font-system);
+  font-size:11px;
+  color:var(--rust);
+  letter-spacing:0.03em;
+  margin-top:10px;
+}
+
+.team-q{
+  border-left:3px solid var(--line);
+  padding-left:10px;
+  margin-bottom:10px;
+  font-size:14px;
+}
+
+::selection{background:var(--amber);color:var(--panel);}
+
+@media (min-width:600px){
+  h1.page-title{font-size:26px;}
+}
+</style>
+</head>
+<body>
+<a href="chartered-realm-map.html" style="position:fixed;top:8px;left:8px;z-index:999;background:rgba(0,0,0,0.6);color:#ecdfc0;font-family:monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:3px;text-decoration:none;border:1px solid rgba(255,255,255,0.25);">&#8592; Map</a>
+
+<div class="device">
+  <div class="bezel-label">PMI ALASKA CHAPTER · CORNERSTONE RECORDS UNIT</div>
+  <div class="screen">
+
+    <div class="status-bar">
+      <div class="status-left"><span class="dot"></span><span id="statusText">TERMINAL ACTIVE</span></div>
+      <div class="status-right" id="statusRight">CODEX V1.9</div>
+    </div>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="rules">Rules</button>
+      <button class="mode-tab" data-mode="character">Build Character</button>
+    </div>
+
+    <!-- RULES SECTION NAV -->
+    <div class="section-nav" id="rulesNav"></div>
+
+    <!-- CHARACTER PROGRESS -->
+    <div id="charProgressWrap" style="display:none;">
+      <div class="progress-track" id="progressTrack"></div>
+      <div class="progress-label" id="progressLabel"></div>
+    </div>
+
+    <div class="content" id="content"></div>
+
+    <!-- CHARACTER WIZARD NAV -->
+    <div class="wizard-nav" id="wizardNav" style="display:none;">
+      <button class="btn secondary" id="btnBack">Back</button>
+      <button class="btn" id="btnNext">Next</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="copy-toast" id="copyToast">RECORD COPIED</div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+
+const JOBS = [
+  {name:"Project Manager", passive:"Critical Path",
+   effect:"Twice per session, grant yourself +2 on a roll.",
+   desc:"Sees linchpins, sequencing, and concrete task failure before anyone else does. Spend Critical Path on the single roll a whole scene is hinging on — not on every roll that's merely inconvenient."},
+  {name:"Program Manager", passive:"Course Correction",
+   effect:"Four times per session, grant yourself +1 on a roll.",
+   desc:"Tracks how several moving pieces affect each other. Course Correction is small but frequent — the right tool for nudging a string of ordinary rolls rather than saving for one dramatic swing."},
+  {name:"Portfolio Manager", passive:"Strategic Bet",
+   effect:"Once per session, grant yourself +4 on a roll.",
+   desc:"Thinks in terms of which effort deserves resources at all. Strategic Bet is the biggest single number in the game — hold it for the roll that decides which direction the whole arc bends."},
+  {name:"Agile Practitioner", passive:"Sprint Reset",
+   effect:"Once per session, reroll up to all dice in a roll, including the Trait d4 if it applied.",
+   desc:"Comfortable discarding a bad attempt and trying again with what was just learned. Best used the instant after a roll comes in low — reroll everything and let the second attempt reflect the new information."},
+  {name:"Product Owner", passive:"Vision Pivot",
+   effect:"Once per session, gain +2 on a roll and reroll 1 die.",
+   desc:"Holds the picture of what \u201cdone and valuable\u201d looks like and can redirect a scene toward it. A hybrid tool for a roll that's close but has one obviously bad die dragging it down."},
+  {name:"Change Manager", passive:"Second Wind",
+   effect:"Once per session, allow another player to reroll up to all of their dice.",
+   desc:"Notices when someone else is about to be the reason a scene stalls, and knows how to help people through a hard moment. The only passive that spends on a teammate instead of yourself."},
+  {name:"Subject Matter Expert", passive:"Domain Mastery",
+   effect:"Doubles the numerical bonus from your Industry when it applies.",
+   desc:"Goes deep instead of wide. Domain Mastery only matters when your Industry bonus would already apply, so an SME wants a table that keeps steering scenes toward their specialty."},
+  {name:"Intern", passive:"Fresh Eyes",
+   effect:"Once per session, grant any player your Industry bonus, and they may reroll a single die.",
+   desc:"Notices what experienced professionals have stopped seeing. Fresh Eyes means the least experienced seat at the table is never a wasted one — it lends an outsider's read to somebody else's critical moment."}
+];
+
+const INDUSTRIES = [
+  {name:"Tech", trigger:"The roll involves a fast fix, a prototype, or adapting a tool on the fly."},
+  {name:"Construction", trigger:"The roll involves physical risk, safety, structural integrity, or infrastructure/utilities."},
+  {name:"Government", trigger:"The roll invokes law, permits, or formal process."},
+  {name:"Healthcare", trigger:"The roll involves triage, urgency, or calming fear."},
+  {name:"Communication", trigger:"The roll involves persuading a group or public audience."},
+  {name:"Finance", trigger:"The roll involves cost, resources, or negotiation over money."},
+  {name:"Manufacturing", trigger:"The roll involves process, sequencing, or efficiency."},
+  {name:"Research", trigger:"The roll involves evidence, precedent, or testing a claim."},
+  {name:"Military / Defense", trigger:"The roll involves authority, command, or crisis sequencing."}
+];
+
+const TRAITS = {
+  Conflict: [
+    {key:"Assertive", desc:"Push, hold ground, direct."},
+    {key:"Collaborative", desc:"Build consensus, shared ownership."}
+  ],
+  Evidence: [
+    {key:"Data-Minded", desc:"Trust documentation and analysis."},
+    {key:"Instinct-Driven", desc:"Read patterns and field judgment."}
+  ],
+  Decision: [
+    {key:"Pragmatic", desc:"Identify critical path, act without sentiment."},
+    {key:"Conviction", desc:"Commit publicly, make others believe."}
+  ]
+};
+
+// key = Conflict|Evidence|Decision using full trait names
+const PERSONAS = {
+  "Assertive|Instinct-Driven|Conviction": {code:"A-I-C", scale:3, name:"The Driver", nick:"Champion",
+    strength:"Decisive leader; creates urgency; breaks through inertia.",
+    failure:"Overreach, backlash; ignores data or process; burns bridges."},
+  "Assertive|Instinct-Driven|Pragmatic": {code:"A-I-P", scale:2, name:"The Field Operator", nick:"Tactician",
+    strength:"Fast adaptations; gets things done under uncertainty.",
+    failure:"Short-term thinking; misses long-term impact or adoption."},
+  "Assertive|Data-Minded|Conviction": {code:"A-D-C", scale:2, name:"The Enforcer", nick:"Accountant of Consequences",
+    strength:"Clear standards; credible authority; low tolerance for excuses.",
+    failure:"Rigid, intimidating, or dismissive of human factors."},
+  "Collaborative|Instinct-Driven|Conviction": {code:"C-I-C", scale:2, name:"The Mobilizer", nick:"Rallymaker",
+    strength:"Builds belief and energy; unites groups for a cause.",
+    failure:"Belief without structure; can drift without execution."},
+  "Collaborative|Data-Minded|Conviction": {code:"C-D-C", scale:1, name:"The Advocate", nick:"Guardian of Legitimacy",
+    strength:"Trust-builder; fair; creates durable legitimacy.",
+    failure:"Slow to act; can be seen as idealistic or obstructive."},
+  "Collaborative|Instinct-Driven|Pragmatic": {code:"C-I-P", scale:1, name:"The Stabilizer", nick:"Keeper of Equilibrium",
+    strength:"Calms chaos; maintains flow; strong situational awareness.",
+    failure:"Reactive, not visionary; may avoid hard confrontations."},
+  "Assertive|Data-Minded|Pragmatic": {code:"A-D-P", scale:1, name:"The Executor", nick:"Manager of Outcomes",
+    strength:"Dependable delivery; balances force with structure.",
+    failure:"May undervalue relationships or legitimacy."},
+  "Collaborative|Data-Minded|Pragmatic": {code:"C-D-P", scale:0, name:"The Architect", nick:"System Weaver",
+    strength:"Builds durable systems; scalable solutions.",
+    failure:"Analysis paralysis; over-designs; too slow in crisis."}
+};
+
+const BIASES = [
+  {no:1, name:"Human Dignity", protects:"Safety, dignity, morale, consent, and trust.",
+   hardLine:"Do not sacrifice vulnerable people as an acceptable process cost.",
+   failure:"Avoids hard prioritization until delay hurts more people.", conflicts:"Delivery First, Sponsor Stewardship"},
+  {no:2, name:"Systems Equity", protects:"Fairness across the whole system.",
+   hardLine:"Do not optimize for one group by hiding harm in another.",
+   failure:"Can slow decisions searching for perfect fairness.", conflicts:"Delivery First, Sponsor Stewardship"},
+  {no:3, name:"Verifiable Truth", protects:"Truth, proof, clarity, documentation, traceability.",
+   hardLine:"Do not ask people to act on unsupported claims.",
+   failure:"Can delay action until evidence is perfect.", conflicts:"Public Legitimacy, Delivery First"},
+  {no:4, name:"Public Legitimacy", protects:"Visible fairness, consent, public buy-in.",
+   hardLine:"Do not make the right decision in a way the public experiences as betrayal.",
+   failure:"Can become optics-driven, avoids unpopular truths.", conflicts:"Verifiable Truth, Continuity Assurance"},
+  {no:5, name:"Process Integrity", protects:"Clear handoffs, repeatable rules, sustainable workflows.",
+   hardLine:"Do not build a fix that only works because one heroic person holds it together.",
+   failure:"Can overbuild procedure during urgent crisis.", conflicts:"Delivery First, Sponsor Stewardship"},
+  {no:6, name:"Sponsor Stewardship", protects:"Authority, cohesion, backing, sponsor survivability.",
+   hardLine:"Do not solve the problem by destroying the sponsor needed to implement it.",
+   failure:"Can protect leaders too long.", conflicts:"Systems Equity, Public Legitimacy"},
+  {no:7, name:"Delivery First", protects:"Speed, throughput, continuity, survival of the mission.",
+   hardLine:"Do not let process theater block necessary action.",
+   failure:"Can treat people as obstacles.", conflicts:"Human Dignity, Process Integrity"},
+  {no:8, name:"Continuity Assurance", protects:"Resilience, recovery, capacity after the crisis.",
+   hardLine:"Do not solve tonight by making tomorrow impossible.",
+   failure:"Can resist necessary short-term sacrifice.", conflicts:"Delivery First, Public Legitimacy"}
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+let mode = "rules";
+let rulesSection = "core";
+let charStep = 0;
+
+const charState = {
+  job:null, industry:null,
+  conflict:null, evidence:null, decision:null,
+  bias:null, hardLine:"", concept:""
+};
+
+const CHAR_STEPS = ["intro","job","industry","traits","persona","bias","concept","summary"];
+const CHAR_LABELS = {
+  intro:"The Four Layers", job:"Stage 1 — Job / Class", industry:"Stage 2 — Industry",
+  traits:"Stage 3 — Dominant Traits", persona:"Stage 4 — Your Persona",
+  bias:"Stage 5 — Professional Bias", concept:"Stage 6 — Concept Sentence",
+  summary:"Your Character Record"
+};
+
+/* ============================================================
+   RULES NAV
+   ============================================================ */
+
+const RULES_SECTIONS = [
+  {id:"core", label:"Core Mechanic"},
+  {id:"traits", label:"Traits"},
+  {id:"difficulty", label:"Difficulty"},
+  {id:"bonuses", label:"Bonuses"},
+  {id:"bias", label:"Bias & Friction"},
+  {id:"scenes", label:"Scenes & Clocks"},
+  {id:"cheatsheet", label:"Cheat Sheet"}
+];
+
+function renderRulesNav(){
+  const nav = document.getElementById('rulesNav');
+  nav.innerHTML = RULES_SECTIONS.map(s =>
+    `<button class="nav-pill ${s.id===rulesSection?'active':''}" data-sec="${s.id}">${s.label}</button>`
+  ).join('');
+  nav.querySelectorAll('.nav-pill').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      rulesSection = btn.dataset.sec;
+      renderRulesNav();
+      renderContent();
+      document.getElementById('content').scrollTop = 0;
+    });
+  });
+}
+
+/* ============================================================
+   RENDER: RULES CONTENT
+   ============================================================ */
+
+function dataRow(tag, title, fields){
+  return `<div class="data-row">
+    <div class="data-row-head"><span>${title}</span>${tag?`<span class="tag">${tag}</span>`:''}</div>
+    <div class="data-row-body">
+      ${fields.map(f=>`<div class="data-field"><span class="fk">${f[0]}</span><span class="fv">${f[1]}</span></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderCore(){
+  return `
+  <div class="eyebrow">Chapter I</div>
+  <h1 class="page-title">The Core Mechanic</h1>
+  <p class="lede">"A good idea identifies leverage. A roll determines whether the leverage moves people under pressure."</p>
+
+  <p>When a character tries to change something — persuade a stakeholder, diagnose a system failure, execute under pressure, or force a hard decision — the GM calls for a <strong>test</strong>. A test asks: does this work the way you want it to, or does the world push back?</p>
+
+  <div class="dice-row">
+    <span class="dice-pill">2d6 (always)</span>
+    <span class="dice-pill">+ d4 (if trait matches)</span>
+    <span class="dice-pill">+ Job Passive</span>
+    <span class="dice-pill">+ Industry (+1)</span>
+    <span class="dice-pill">+ Rule Zero</span>
+    <span class="dice-pill">− Difficulty</span>
+  </div>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ Making a Test — Step by Step</div>
+    <p style="margin-bottom:8px;">1. Player describes the action and intent — what are you trying to change, and what does success look like?</p>
+    <p style="margin-bottom:8px;">2. GM names the specific trait the action embodies ("that's an Assertive move," "that's Data-Minded thinking") based on how it was described.</p>
+    <p style="margin-bottom:8px;">3. Player rolls 2d6.</p>
+    <p style="margin-bottom:8px;">4. If the named trait matches the character's marked dominant trait, add a d4.</p>
+    <p style="margin-bottom:8px;">5. Add any triggered Job Passive bonus, Industry bonus (+1) if it clearly applies, and a Rule Zero bonus if earned. All of these stack together.</p>
+    <p style="margin-bottom:8px;">6. Apply the difficulty penalty if the test is harder than standard.</p>
+    <p style="margin-bottom:0;">7. Read the total: <strong>10+</strong> full success · <strong>7–9</strong> success with a cost · <strong>6−</strong> failure with consequences.</p>
+  </div>
+
+  <div class="callout example">
+    <div class="callout-label">▸ Worked Example</div>
+    <p style="margin-bottom:0;">A player says their character will push through a stalled negotiation by refusing to back down. The GM names this an <strong>Assertive</strong> move. If the character's marked Conflict trait is Assertive, add the d4. If it's Collaborative instead, no d4 — the approach isn't their instinct, but they can still attempt it.</p>
+  </div>
+
+  <h2 class="sub-title">Reading the Result</h2>
+  <table class="mini-table">
+    <tr><th>Total</th><th>Result</th><th>What the GM does</th></tr>
+    <tr><td><strong>10+</strong></td><td>Full success</td><td>Give the intended outcome. Move the story forward. Show the visible improvement.</td></tr>
+    <tr><td><strong>7–9</strong></td><td>Partial success</td><td>Give success with a visible cost, complication, condition, or hard choice.</td></tr>
+    <tr><td><strong>6−</strong></td><td>Failure</td><td>Make the story harder. Change the situation. Always leave a next move.</td></tr>
+  </table>
+
+  <div class="callout example">
+    <div class="callout-label">▸ Example — Three Outcomes on the Same Action</div>
+    <p>A Project Manager with a Manufacturing background tries to convince a foundry master to restart production by mapping a broken payment loop. They roll, add their matching trait's d4, and add their Manufacturing Industry bonus.</p>
+    <p><strong>Rolled 10:</strong> full success. The foundry master reviews the map, names three specific people who caused the loop, and agrees to restart — on condition that payment authority arrives in writing before nightfall.</p>
+    <p><strong>Rolled 9:</strong> the foundry master believes the map but won't commit publicly until a higher authority has seen it. Success, but with a new dependency.</p>
+    <p style="margin-bottom:0;"><strong>Rolled 5:</strong> the foundry master closes the ledger. "Show me a signed order, not a diagram." A relevant pressure clock ticks.</p>
+  </div>
+
+  <div class="callout example">
+    <div class="callout-label">▸ New Example — Same Roll, Different Table</div>
+    <p>A Scrum-styled Agile Practitioner tries to get a market vendor to accept a shared loading schedule during a supply crunch. They frame it as a fast, testable pilot rather than a permanent rule.</p>
+    <p><strong>Rolled 11:</strong> the vendor agrees on the spot, and even offers to recruit two neighboring stalls before the next test roll comes up.</p>
+    <p><strong>Rolled 8:</strong> the vendor agrees to try it for one market day only, and wants a visible person to blame if it goes wrong — someone has to put their name on it.</p>
+    <p style="margin-bottom:0;"><strong>Rolled 4:</strong> the vendor refuses outright and tells two other stallholders that "the coordinators are trying to control the market now." The Public Panic clock ticks up one.</p>
+  </div>
+
+  <h2 class="sub-title">When to Roll</h2>
+  <p>Dice are for genuine uncertainty, resistance, or opposition — never for proving competence. If a player applies a real PM concept correctly, the GM should reward that with insight or leverage, not force a roll. The roll comes when the leverage tries to move something that doesn't want to move.</p>
+
+  <table class="mini-table">
+    <tr><th>Roll when…</th><th>Don't roll when…</th></tr>
+    <tr><td>The action asks a person or system to change under pressure.</td><td>No named stakeholder resists and no clock is under pressure.</td></tr>
+    <tr><td>A stakeholder could lose face, status, money, authority, safety, or control.</td><td>The action is busywork, established fact, or obvious observation.</td></tr>
+    <tr><td>Time pressure, scarcity, fear, or incomplete information makes success uncertain.</td><td>A player asks a sharp question or applies a concept correctly — give useful insight instead.</td></tr>
+    <tr><td>The players are executing a plan, not merely describing one.</td><td>The same failed tactic is repeated without new leverage or a changed audience.</td></tr>
+  </table>
+
+  <h2 class="sub-title">Fortune Checks</h2>
+  <p>A Fortune Check represents the world, not player competence — weather, timing, third-party action, off-screen pressure, or whether a rumor has already spread. The GM names it explicitly. Your abilities don't affect a Fortune Check unless a rule says otherwise.</p>
+
+  <h2 class="sub-title">Failed Rolls Change the Landscape</h2>
+  <p>A failed roll doesn't close the problem — it changes the negotiating landscape. The same objective may still be possible, but the room is less receptive, a clock advances, or a stakeholder now demands something different. Trying the exact same thing again immediately after a failed roll generally isn't allowed — come back with new leverage or a new audience.</p>
+  `;
+}
+
+function renderTraits(){
+  return `
+  <div class="eyebrow">Chapter II</div>
+  <h1 class="page-title">Dominant Traits</h1>
+  <p class="lede">How you act under pressure — not who you are all the time.</p>
+
+  <p>Every character has three trait slots: <strong>Conflict, Evidence,</strong> and <strong>Decision</strong>. In each slot you choose one of two traits. When a test is called and the named trait matches your marked dominant trait, you add a d4 to the roll.</p>
+
+  <table class="mini-table">
+    <tr><th>Slot</th><th>Option A</th><th>Option B</th></tr>
+    <tr><td><strong>Conflict</strong></td><td><strong>Assertive</strong> — push, hold ground, direct.</td><td><strong>Collaborative</strong> — build consensus, shared ownership.</td></tr>
+    <tr><td><strong>Evidence</strong></td><td><strong>Data-Minded</strong> — trust documentation and analysis.</td><td><strong>Instinct-Driven</strong> — read patterns and field judgment.</td></tr>
+    <tr><td><strong>Decision</strong></td><td><strong>Pragmatic</strong> — identify critical path, act without sentiment.</td><td><strong>Conviction</strong> — commit publicly, make others believe.</td></tr>
+  </table>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ Only One Slot Matches Per Roll</div>
+    <p style="margin-bottom:0;">The GM names <em>one</em> trait per test, based on how you described your action. Only that named trait can earn you the d4 — the other two slots sit out that roll, even if they'd also apply narratively. This is why the three choices you make matter: they decide which kinds of moves your character is naturally built for.</p>
+  </div>
+
+  <h2 class="sub-title">Trait Personas</h2>
+  <p>Your three trait choices combine into a persona — a shorthand for what pressure makes you effective and what mistake you're prone to making. A persona is a playstyle signal, <strong>not a class restriction</strong>. You can act against your persona any time; you simply won't get the d4 for it.</p>
+
+  <div class="data-table" id="personaTable"></div>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ Team Composition</div>
+    <p style="margin-bottom:0;">A team made entirely of Collaborative characters will struggle to force an urgent decision or name an owner. A team of all Assertive characters moves fast but creates backlash and public legitimacy problems. Look at how your table distributed its choices across Conflict, Evidence, and Decision — the pattern you see is the blind spot the GM will eventually pressure.</p>
+  </div>
+
+  <h2 class="sub-title">Three Questions Every Character Should Answer</h2>
+  <p>After character creation, say these out loud at the table:</p>
+  <ul style="padding-left:20px;font-size:15px;line-height:1.7;">
+    <li>What do I notice first?</li>
+    <li>What do I protect?</li>
+    <li>What do I overdo when I am right?</li>
+  </ul>
+  <p>The third question matters most — it gives the GM permission to pressure your character in a way that feels fair, specific, and earned.</p>
+  `;
+}
+
+function renderDifficulty(){
+  return `
+  <div class="eyebrow">Chapter I</div>
+  <h1 class="page-title">Difficulty & Fortune</h1>
+  <p class="lede">The same idea gets harder to land as the stakes climb.</p>
+
+  <table class="mini-table">
+    <tr><th>Difficulty</th><th>Modifier</th><th>When to use it</th></tr>
+    <tr><td><strong>Standard</strong></td><td>+0</td><td>The action is risky but plausible. Most tests begin here.</td></tr>
+    <tr><td><strong>Difficult</strong></td><td>−2</td><td>The NPC is skeptical, time is short, or the team lacks full context.</td></tr>
+    <tr><td><strong>Severe</strong></td><td>−4</td><td>The action threatens status, resources, public legitimacy, or a powerful faction.</td></tr>
+    <tr><td><strong>Critical</strong></td><td>−6</td><td>The action attempts to change a decision under public pressure or against active opposition.</td></tr>
+    <tr><td><strong>Impossible</strong></td><td>no roll yet</td><td>Can't work until players create leverage: evidence, authority, collateral, safety, a credible consequence, or a changed audience.</td></tr>
+  </table>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ One Reroll Maximum</div>
+    <p style="margin-bottom:0;">A single die is never rerolled more than once, regardless of source. If two abilities would both offer to reroll the same die, the second one has nothing left to do.</p>
+  </div>
+
+  <div class="callout example">
+    <div class="callout-label">▸ New Example — One Ask, Four Difficulties</div>
+    <p>A character wants the Craftsmen's Guild to release five workers to help with an emergency repair. The same request lands very differently depending on the room:</p>
+    <p><strong>Standard:</strong> asked privately, to a foreman who already likes the team. Nothing much is on the line for him personally.</p>
+    <p><strong>Difficult (−2):</strong> asked in front of two other foremen who will remember whether he looked weak.</p>
+    <p><strong>Severe (−4):</strong> asked during a guild vote, where releasing workers means publicly contradicting the Guildmaster's stated priorities.</p>
+    <p style="margin-bottom:0;"><strong>Critical (−6):</strong> asked minutes after a rival guild publicly framed the request as a Crown power grab — now agreeing looks like betrayal, not generosity.</p>
+  </div>
+
+  <h2 class="sub-title">Fortune Checks</h2>
+  <p>A Fortune Check represents the world rolling, not the character. It covers weather, timing, whether a rumor already spread, or what a third party did off-screen. The GM names a Fortune Check explicitly, and your character abilities don't modify it unless a rule specifically says they do.</p>
+
+  <h2 class="sub-title">What Failure Actually Looks Like</h2>
+  <div class="callout rule">
+    <div class="callout-label">⚑ GM Note — What Failure Looks Like</div>
+    <p style="margin-bottom:0;">Failure in The Chartered Realm is rarely "nothing happens." It's: someone hardens their position, a rumor outruns the truth, a sponsor loses face, a resource becomes conditional, or a workaround creates later debt. There's always a next move — but the last move made this one more expensive.</p>
+  </div>
+  `;
+}
+
+function renderBonuses(){
+  const jobRows = JOBS.map(j => dataRow(j.passive, j.name, [
+    ["Effect", j.effect],
+    ["How it plays", j.desc]
+  ])).join('');
+
+  const indRows = INDUSTRIES.map(i => dataRow(null, i.name, [
+    ["+1 Bonus When…", i.trigger]
+  ])).join('');
+
+  return `
+  <div class="eyebrow">Chapter IV</div>
+  <h1 class="page-title">Bonuses & Passives</h1>
+  <p class="lede">Job Passive + Industry + Rule Zero — all of it stacks on the same roll.</p>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ Everything Stacks</div>
+    <p style="margin-bottom:0;">Job Passive, Industry, and Rule Zero bonuses all stack together unconditionally on the same test, on top of the base 2d6 (+ the Trait d4 if it matches). There is no pick-one rule between them. The only universal limit is that a single die is never rerolled more than once.</p>
+  </div>
+
+  <h2 class="sub-title">Job Passives</h2>
+  <p>Each Job/Class gives a passive ability. Passives are pure bonuses or rerolls, player-triggered, with no fictional trigger condition required — you decide when to use one, within its per-session limit.</p>
+  <div class="data-table">${jobRows}</div>
+
+  <h2 class="sub-title">Industry Bonus</h2>
+  <p>Your Industry is a flat <strong>+1</strong> whenever the situation clearly matches your professional background.</p>
+  <div class="data-table">${indRows}</div>
+
+  <div class="callout example">
+    <div class="callout-label">▸ New Example — Industry Stacking with Job</div>
+    <p style="margin-bottom:0;">A Subject Matter Expert with a Healthcare background triages a collapsed worker at a market stall. The roll is Instinct-Driven (matches their trait, +d4), gets the Healthcare +1 Industry bonus for the triage situation — and because their Job passive is Domain Mastery, that +1 doubles to +2. Total: 2d6 + d4 + 2, before any Rule Zero bonus for a genuinely sharp diagnosis.</p>
+  </div>
+
+  <h2 class="sub-title">Rule Zero</h2>
+  <p>If a player applies a real PM concept, framework, or tool in a genuinely appropriate way, the GM should reward it. A Rule Zero bonus is independent of Job Passives — a triggered Job Passive always applies in addition to whatever Rule Zero grants. Even when the team does everything right, success still isn't guaranteed.</p>
+
+  <table class="mini-table">
+    <tr><th>Reward Type</th><th>When to use it</th></tr>
+    <tr><td><strong>Insight</strong></td><td>The idea correctly identifies the actual system, risk, dependency, or hidden stakeholder.</td></tr>
+    <tr><td><strong>Leverage</strong></td><td>The idea creates a reason someone might move: evidence, authority, public commitment, safety, or reputational pressure.</td></tr>
+    <tr><td><strong>Permission</strong></td><td>The idea makes an impossible action plausible enough to roll.</td></tr>
+    <tr><td><strong>Difficulty reduction</strong></td><td>The idea makes the attempt materially easier. Reduce the difficulty penalty by 1 step.</td></tr>
+    <tr><td><strong>+2 bonus</strong></td><td>The idea is directly applicable, specific, and actionable in this scene.</td></tr>
+    <tr><td><strong>Avoid one consequence</strong></td><td>The idea protects against a known failure mode or clock tick.</td></tr>
+    <tr><td><strong>Automatic success</strong></td><td>Use only when no meaningful stakeholder resists and no clock is under immediate pressure.</td></tr>
+  </table>
+
+  <div class="callout example">
+    <div class="callout-label">▸ Example — PM Concept to Leverage to Test</div>
+    <p>The players want a merchant guild leader to co-sign an emergency ledger. A player proposes a stakeholder matrix showing Crown, guild, merchant, commoner, and Gurach Vel interests.</p>
+    <p><strong>Step 1 — Insight:</strong> the matrix is analysis, not the roll. The GM tells them the guild leader isn't resisting because he doubts the numbers — he's resisting because a public ledger reduces his leverage and creates liability.</p>
+    <p><strong>Step 2 — Leverage identified:</strong> a narrow scope, liability limits, a public witness role instead of ownership, or proof that delay costs merchants more.</p>
+    <p><strong>Step 3 — Resistance Gate:</strong> he loses secrecy, negotiating advantage, and plausible deniability. He can say no unless the proposal addresses at least one of those losses.</p>
+    <p><strong>Step 4 — Test called:</strong> if the players offer a narrow ledger with liability boundaries and a visible merchant role, that's leverage. Now call for a test. The PM concept unlocked the attempt — it didn't replace it.</p>
+    <p style="margin-bottom:0;"><strong>Step 5 — Outcomes:</strong> 10+ he signs with a livable condition. 7–9 he signs but extracts confidentiality or tariff language. 6− he refuses publicly and a pressure clock advances.</p>
+  </div>
+  `;
+}
+
+function renderBias(){
+  const biasRows = BIASES.map(b => dataRow(`No. ${b.no}`, b.name, [
+    ["Protects", b.protects],
+    ["Hard Line", b.hardLine],
+    ["Failure Mode", b.failure],
+    ["Conflicts With", b.conflicts]
+  ])).join('');
+
+  return `
+  <div class="eyebrow">Chapter III</div>
+  <h1 class="page-title">Professional Bias & Moral Friction</h1>
+  <p class="lede">"Two characters can share the same persona and feel entirely different if one protects Human Dignity and the other protects Sponsor Stewardship."</p>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ Bias Is Not a Trait</div>
+    <p style="margin-bottom:0;">Traits describe how you move. Bias describes what you protect when pressure makes easy consensus tempting. These are deliberately separate systems — do not treat your Bias as a fourth trait slot, and never let it grant a d4.</p>
+  </div>
+
+  <h2 class="sub-title">The Bias Matrix</h2>
+  <div class="data-table">${biasRows}</div>
+
+  <h2 class="sub-title">Using Bias in Play</h2>
+  <p>When a dilemma touches your Professional Bias, the GM asks: <strong>what are you unwilling to sacrifice here?</strong></p>
+  <ul style="padding-left:20px;font-size:15px;line-height:1.7;">
+    <li><strong>Uphold the bias despite real cost</strong> — take the harder, slower, or costlier path to protect what you refuse to sacrifice. This is not a bonus. It should visibly cost time, ease, or standing in the fiction.</li>
+    <li><strong>Knowingly violate the bias for expediency</strong> — mark Moral Friction.</li>
+  </ul>
+
+  <div class="callout example">
+    <div class="callout-label">▸ Example — Bias in Play</div>
+    <p>The team needs a foundry master to restart production tonight. The fastest path is threatening a sponsor's withdrawal of guild protection — a real lever, but one that bypasses the foundry master's dignity and may create lasting resentment.</p>
+    <p>One teammate (Verifiable Truth) refuses to let the threat stand without proof the withdrawal is actually authorized. They insist on checking the charter first, slowing the scene by one beat. This is upholding their bias at real cost — no bonus, just the choice and its price.</p>
+    <p style="margin-bottom:0;">Another teammate (Delivery First) pushes the threat through anyway. The foundry restarts faster — but they've knowingly treated dignity as inefficiency. They mark Moral Friction.</p>
+  </div>
+
+  <h2 class="sub-title">Moral Friction</h2>
+  <p>Moral Friction flags that a character knowingly violated their Professional Bias for expediency. It doesn't punish the decision itself — it records the cost.</p>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ While Moral Friction Is Active</div>
+    <p style="margin-bottom:0;">Every roll is a bare 2d6. Do <strong>not</strong> add the Trait d4, even if it matches. Do not add a Job Passive bonus, even if triggered. Do not add an Industry bonus or a Rule Zero bonus. Difficulty still applies as normal.</p>
+  </div>
+
+  <h3 class="mini-title">Clearing Moral Friction</h3>
+  <p>You must genuinely reconcile the compromise — through a retrospective, an apology, public accountability, restitution, or a later choice that meaningfully honors what you sacrificed. Any of these can be attempted whenever you're ready; it's the GM's judgment call whether the attempt is sincere.</p>
+  <p><strong>An insincere attempt doesn't clear it.</strong> A character who justifies rather than reconciles — who explains why the choice was correct instead of naming what it cost — has not cleared Moral Friction, no matter which method they invoke.</p>
+  <p><strong>Clearing it costs the table something.</strong> When a repair attempt succeeds, a relevant stakeholder or pressure clock advances by 1. Resolving your own ethical debt is not free for the people around you.</p>
+
+  <div class="callout example">
+    <div class="callout-label">▸ Example — Clearing Moral Friction</div>
+    <p>A player under Moral Friction from the foundry threat tells the GM, "I apologize" — then spends the conversation explaining why the threat was necessary. The GM rules this is justification, not reconciliation, and denies the repair. Moral Friction remains.</p>
+    <p style="margin-bottom:0;">Later, the team calls for a retrospective. The player recognizes and publicly declares that they broke from their bias. The GM rules this sincere and clears Moral Friction — but a relevant stakeholder clock advances by 1.</p>
+  </div>
+  `;
+}
+
+function renderScenes(){
+  return `
+  <div class="eyebrow">Chapters V–VII</div>
+  <h1 class="page-title">Scenes, Leverage & Clocks</h1>
+  <p class="lede">"Before accepting a major player proposal, ask: who loses something if this works?"</p>
+
+  <h2 class="sub-title">The Resistance Gate</h2>
+  <p>Before a big proposal succeeds automatically, the GM checks who loses something. If no one loses anything, the action probably doesn't need a roll. If someone loses something significant, they resist — and the manner of that resistance is the scene.</p>
+
+  <table class="mini-table">
+    <tr><th>If someone loses…</th><th>Likely result</th></tr>
+    <tr><td><strong>Status</strong></td><td>They say no, delay, demand public ownership, or attack the messenger.</td></tr>
+    <tr><td><strong>Resources</strong></td><td>They demand compensation, collateral, priority, or proof.</td></tr>
+    <tr><td><strong>Authority</strong></td><td>They insist on procedure, escalate, or claim illegitimacy.</td></tr>
+    <tr><td><strong>Safety</strong></td><td>They seek cover, witnesses, written orders, or anonymity.</td></tr>
+    <tr><td><strong>Reputation</strong></td><td>They deny facts, attack evidence, or reframe the issue.</td></tr>
+    <tr><td><strong>Time</strong></td><td>They comply partially, miss steps, or produce a brittle fix.</td></tr>
+  </table>
+
+  <h2 class="sub-title">Leverage Mechanics</h2>
+  <p>Leverage is what players build <em>before</em> a roll — it's not a roll result. It's what makes an otherwise impossible action possible, or a difficult action easier.</p>
+  <table class="mini-table">
+    <tr><th>Leverage Type</th><th>What it does</th></tr>
+    <tr><td><strong>Evidence</strong></td><td>Records, maps, testimony, precedent. Forces NPCs to address facts instead of denying them.</td></tr>
+    <tr><td><strong>Authority</strong></td><td>A mandate or public commitment the NPC can't ignore. Makes refusal politically costly.</td></tr>
+    <tr><td><strong>Collateral</strong></td><td>Something the NPC values, conditional on cooperation: a contract, payment, liability limit.</td></tr>
+    <tr><td><strong>Safety</strong></td><td>A credible guarantee the NPC won't be blamed or punished for cooperating.</td></tr>
+    <tr><td><strong>Reputation</strong></td><td>Framing that makes cooperation look good and obstruction look bad.</td></tr>
+    <tr><td><strong>Time</strong></td><td>A credible consequence that makes delay costlier than action.</td></tr>
+  </table>
+
+  <h2 class="sub-title">Dilemmas, Not Puzzles</h2>
+  <p>Many scenes are dilemmas: every viable option sacrifices something. You may find elegant solutions, but not every situation has a single correct answer.</p>
+  <table class="mini-table">
+    <tr><th>Type</th><th>Question</th><th>Typical Cost</th></tr>
+    <tr><td>Prioritization</td><td>What must be cut, delayed, or left exposed?</td><td>Safety, trust, delivery, legitimacy, or future capacity.</td></tr>
+    <tr><td>Ethical</td><td>What is effective but morally compromised?</td><td>Reputation, fairness, consent, or Professional Bias.</td></tr>
+    <tr><td>Governance</td><td>Who gets authority, and who loses veto power?</td><td>Sponsor trust, faction standing, speed, or accountability.</td></tr>
+    <tr><td>Transparency</td><td>How much truth can the public handle right now?</td><td>Panic, later betrayal, confusion, or misinformation.</td></tr>
+    <tr><td>Equity</td><td>Who receives scarce resources first?</td><td>Efficiency, fairness, public order, or political protection.</td></tr>
+    <tr><td>Sponsor</td><td>Preserve the sponsor relationship, or force the right decision?</td><td>Warmth, authority, speed, dignity, or courage.</td></tr>
+    <tr><td>Evidence</td><td>Wait for better facts, or act on incomplete information?</td><td>Accuracy, time, credibility, or avoidable harm.</td></tr>
+    <tr><td>Sustainability</td><td>Heroic temporary fix, or slower durable capacity?</td><td>Immediate relief, long-term resilience, labor morale.</td></tr>
+  </table>
+
+  <h2 class="sub-title">Clocks</h2>
+  <p>Clocks make pressure visible in four, six, or eight segments, and let partial success matter.</p>
+  <table class="mini-table">
+    <tr><th>Size</th><th>Use for</th></tr>
+    <tr><td>4 segments</td><td>Immediate crisis — riot, failed gate, public scandal, sponsor shutdown.</td></tr>
+    <tr><td>6 segments</td><td>Scene-to-scene pressure — faction patience, resource depletion, rumor spread.</td></tr>
+    <tr><td>8 segments</td><td>Arc-level change — siege collapse, reform movement, guild consolidation.</td></tr>
+  </table>
+
+  <div class="callout example">
+    <div class="callout-label">▸ Example — Clock in Motion</div>
+    <p>The Public Panic clock sits at 2 of 4 when the session begins. A failed Decision/Pragmatic test trying to establish a food distribution chain ticks it to 3 — word has spread that the palace doesn't know the grain schedule. A successful Conflict/Collaborative test negotiating with a trusted local voice reduces it back to 2 and pauses it for one scene.</p>
+  </div>
+
+  <div class="callout example">
+    <div class="callout-label">▸ New Example — A Different Clock</div>
+    <p>The Craftsmen's Guild Patience clock sits at 1 of 6. Two members feel the team keeps promising audiences with the Crown that never materialize. A partial success (7–9) delivering a real but limited concession pauses the clock for one scene rather than reducing it — the guild is willing to wait and see, but hasn't actually been won over yet. A later failure that publicly embarrasses the guild's spokesperson jumps the clock from 1 to 4 in a single tick — trust erodes far faster than it builds.</p>
+  </div>
+
+  <h2 class="sub-title">Clock Relief</h2>
+  <table class="mini-table">
+    <tr><th>Player Action</th><th>Clock Relief</th></tr>
+    <tr><td>Creates credible public communication</td><td>Reduce Public Panic by 1, or pause it for one scene.</td></tr>
+    <tr><td>Names an accountable owner with authority</td><td>Pause an execution or coordination clock.</td></tr>
+    <tr><td>Removes a real bottleneck</td><td>Reduce the relevant infrastructure or delivery clock by 1.</td></tr>
+    <tr><td>Makes a visible sacrifice</td><td>Reduce a trust/legitimacy clock by 1.</td></tr>
+    <tr><td>Gives a resistant stakeholder safety or dignity</td><td>Reduce Stakeholder Resistance by 1, or lower difficulty on the next related test.</td></tr>
+    <tr><td>Builds a temporary workaround</td><td>Pause a clock, but add a future consequence or debt.</td></tr>
+    <tr><td>Trades one pressure for another</td><td>Reduce one clock and advance another.</td></tr>
+  </table>
+
+  <h2 class="sub-title">Team Renown</h2>
+  <p>0–10 campaign scale, shared by the whole team. Starts at <strong>2</strong>.</p>
+  <table class="mini-table">
+    <tr><th>Renown</th><th>Meaning</th></tr>
+    <tr><td>0–1</td><td>Unknown or distrusted. Most factions treat you as outsiders.</td></tr>
+    <tr><td>2 (start)</td><td>Known enough to be noticed.</td></tr>
+    <tr><td>3–4</td><td>Useful newcomers. Minor officials and pressured NPCs will hear you out.</td></tr>
+    <tr><td>5–6</td><td>Recognized problem-solvers. Private audiences become possible; you may choose a formal name.</td></tr>
+    <tr><td>7–8</td><td>Regional actors. Factions adapt plans around you.</td></tr>
+    <tr><td>9–10</td><td>Historic figures. Your decisions reshape Cornerstone and the Realm.</td></tr>
+  </table>
+  `;
+}
+
+function renderCheatsheet(){
+  return `
+  <div class="eyebrow">Appendix B</div>
+  <h1 class="page-title">Quick Reference</h1>
+  <p class="lede">One page. Keep it open while you play.</p>
+
+  <div class="callout rule">
+    <div class="callout-label">⚑ The Loop</div>
+    <p style="margin-bottom:0;">Roll 2d6 → add d4 if the named trait matches your marked trait → add Job Passive + Industry (+1) + Rule Zero, all stacking → apply difficulty → read the total. <strong>10+</strong> full success · <strong>7–9</strong> success with cost · <strong>6−</strong> failure with consequences.</p>
+  </div>
+
+  <table class="mini-table">
+    <tr><th>Rule</th><th>Reminder</th></tr>
+    <tr><td>Good ideas are not outcomes</td><td>Insight identifies leverage. Influence changes people. Execution changes reality.</td></tr>
+    <tr><td>Resistance Gate</td><td>Ask: who loses something if this works?</td></tr>
+    <tr><td>Difficulty</td><td>Standard +0 / Difficult −2 / Severe −4 / Critical −6 / Impossible until leverage exists.</td></tr>
+    <tr><td>Dominant Traits</td><td>Conflict, Evidence, Decision — one marked trait each. Add d4 only when the GM's named trait matches.</td></tr>
+    <tr><td>Trait Persona</td><td>Playstyle cue, not a rule restriction.</td></tr>
+    <tr><td>Professional Bias</td><td>What you protect when pressure makes easy consensus tempting.</td></tr>
+    <tr><td>Moral Friction</td><td>Mark it when you knowingly violate your bias. Clears through sincere repair — and advances a clock when it does.</td></tr>
+    <tr><td>Team Renown</td><td>0–10 campaign scale, starts at 2.</td></tr>
+    <tr><td>Rerolls</td><td>A single die is never rerolled more than once, regardless of source.</td></tr>
+    <tr><td>Bonus stacking</td><td>Job Passive, Industry, and Rule Zero bonuses all stack together, unconditionally.</td></tr>
+  </table>
+
+  <h2 class="sub-title">Trait Slots</h2>
+  <table class="mini-table">
+    <tr><th>Slot</th><th>Options</th></tr>
+    <tr><td>Conflict</td><td>Assertive / Collaborative</td></tr>
+    <tr><td>Evidence</td><td>Data-Minded / Instinct-Driven</td></tr>
+    <tr><td>Decision</td><td>Pragmatic / Conviction</td></tr>
+  </table>
+
+  <h2 class="sub-title">Job Passives</h2>
+  <table class="mini-table">
+    ${JOBS.map(j=>`<tr><td><strong>${j.name}</strong><br><span style="color:var(--ink-faint);font-family:var(--font-system);font-size:10.5px;">${j.passive}</span></td><td>${j.effect}</td></tr>`).join('')}
+  </table>
+
+  <h2 class="sub-title">Industry Triggers</h2>
+  <table class="mini-table">
+    ${INDUSTRIES.map(i=>`<tr><td><strong>${i.name}</strong></td><td>${i.trigger}</td></tr>`).join('')}
+  </table>
+
+  <h2 class="sub-title">The Eight Biases</h2>
+  <table class="mini-table">
+    ${BIASES.map(b=>`<tr><td><strong>${b.no}. ${b.name}</strong></td><td>${b.protects}</td></tr>`).join('')}
+  </table>
+  `;
+}
+
+function renderContent(){
+  const el = document.getElementById('content');
+  if(mode === 'rules'){
+    const map = {
+      core: renderCore, traits: renderTraits, difficulty: renderDifficulty,
+      bonuses: renderBonuses, bias: renderBias, scenes: renderScenes,
+      cheatsheet: renderCheatsheet
+    };
+    el.innerHTML = map[rulesSection]();
+    if(rulesSection === 'traits'){
+      const wrap = document.getElementById('personaTable');
+      const seen = {};
+      const rows = [];
+      Object.keys(PERSONAS).forEach(k=>{
+        const p = PERSONAS[k];
+        rows.push(dataRow(`Warm ${p.scale}`, `${p.name} <span style="color:var(--ink-faint);font-weight:400;font-size:12px;">(${p.nick})</span>`, [
+          ["Trait Combo", `${p.code} — ${k.replace(/\|/g,' / ')}`],
+          ["Likely Strength", p.strength],
+          ["Likely Failure Mode", p.failure]
+        ]));
+      });
+      wrap.innerHTML = rows.join('');
+    }
+  } else {
+    renderCharacterStep();
+  }
+}
+
+/* ============================================================
+   CHARACTER BUILDER
+   ============================================================ */
+
+function currentStepId(){ return CHAR_STEPS[charStep]; }
+
+function renderProgress(){
+  const track = document.getElementById('progressTrack');
+  const label = document.getElementById('progressLabel');
+  track.innerHTML = CHAR_STEPS.map((s,i)=>{
+    let cls = '';
+    if(i < charStep) cls = 'done';
+    if(i === charStep) cls = 'current';
+    return `<div class="progress-dot ${cls}"></div>`;
+  }).join('');
+  label.textContent = CHAR_LABELS[currentStepId()];
+}
+
+function optionCard(id, name, tag, effect, desc, selected, onClick){
+  return `<div class="option-card ${selected?'selected':''}" data-id="${id}">
+    <div class="option-card-head">
+      <span class="option-name">${name}</span>
+      ${selected?'<span class="check-badge">✓</span>':(tag?`<span class="option-tag">${tag}</span>`:'')}
+    </div>
+    ${effect?`<div class="option-effect">${effect}</div>`:''}
+    ${desc?`<div class="option-desc">${desc}</div>`:''}
+  </div>`;
+}
+
+function renderCharacterStep(){
+  const el = document.getElementById('content');
+  const step = currentStepId();
+
+  if(step === 'intro'){
+    el.innerHTML = `
+      <div class="eyebrow">Chapter II</div>
+      <h1 class="page-title">Character Creation</h1>
+      <p class="lede">"Build a professional who is useful, biased, and professionally dangerous."</p>
+      <p>Characters in The Chartered Realm are not combat roles. They are professionals. You'll build yours in four layers, across six stages.</p>
+      <table class="mini-table">
+        <tr><th>Layer</th><th>Question</th><th>What it does in play</th></tr>
+        <tr><td><strong>Job / Class</strong></td><td>What kind of PM or coordinator are you?</td><td>Passive ability — what you notice before anyone else.</td></tr>
+        <tr><td><strong>Industry</strong></td><td>What kind of mess are you used to?</td><td>Industry ability — what Cornerstone finds strange about your background.</td></tr>
+        <tr><td><strong>Dominant Traits</strong></td><td>How do you act under pressure?</td><td>Determines the d4 bonus and your natural problem-solving style.</td></tr>
+        <tr><td><strong>Professional Bias</strong></td><td>What do you refuse to sacrifice?</td><td>Ethical tension and a principled hard line.</td></tr>
+      </table>
+      <p>Tap <strong>Next</strong> below to begin at Stage 1. Your choices are held for this session — the final screen gives you a copyable character record.</p>
+    `;
+    return;
+  }
+
+  if(step === 'job'){
+    el.innerHTML = `
+      <div class="eyebrow">Stage 1</div>
+      <h1 class="page-title">Choose Your Job / Class</h1>
+      <p>Your Job determines what you notice before anyone else, and gives a passive ability that always stacks with your other bonuses.</p>
+      <div id="jobList"></div>
+    `;
+    const list = document.getElementById('jobList');
+    list.innerHTML = JOBS.map(j => optionCard(j.name, j.name, null, `${j.passive} — ${j.effect}`, j.desc, charState.job===j.name)).join('');
+    list.querySelectorAll('.option-card').forEach(card=>{
+      card.addEventListener('click', ()=>{ charState.job = card.dataset.id; renderCharacterStep(); updateNav(); });
+    });
+    return;
+  }
+
+  if(step === 'industry'){
+    el.innerHTML = `
+      <div class="eyebrow">Stage 2</div>
+      <h1 class="page-title">Choose Your Industry</h1>
+      <p>Your Industry defines what kind of mess you consider normal, and gives a flat +1 bonus when it clearly applies.</p>
+      <div id="indList"></div>
+    `;
+    const list = document.getElementById('indList');
+    list.innerHTML = INDUSTRIES.map(i => optionCard(i.name, i.name, null, `+1 when: ${i.trigger}`, null, charState.industry===i.name)).join('');
+    list.querySelectorAll('.option-card').forEach(card=>{
+      card.addEventListener('click', ()=>{ charState.industry = card.dataset.id; renderCharacterStep(); updateNav(); });
+    });
+    return;
+  }
+
+  if(step === 'traits'){
+    el.innerHTML = `
+      <div class="eyebrow">Stage 3</div>
+      <h1 class="page-title">Choose Your Dominant Traits</h1>
+      <p>Pick one trait in each slot. These three choices create your persona and determine when you add the d4 bonus.</p>
+      <div id="traitSlots"></div>
+    `;
+    const wrap = document.getElementById('traitSlots');
+    wrap.innerHTML = Object.keys(TRAITS).map(slot => `
+      <div class="trait-slot">
+        <div class="trait-slot-title">${slot}</div>
+        <div class="trait-choice-row">
+          ${TRAITS[slot].map(t => `
+            <div class="trait-choice ${charState[slot.toLowerCase()]===t.key?'selected':''}" data-slot="${slot.toLowerCase()}" data-key="${t.key}">
+              <div class="tc-name">${t.key}</div>
+              <div class="tc-desc">${t.desc}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+    wrap.querySelectorAll('.trait-choice').forEach(c=>{
+      c.addEventListener('click', ()=>{
+        charState[c.dataset.slot] = c.dataset.key;
+        renderCharacterStep();
+        updateNav();
+      });
+    });
+    return;
+  }
+
+  if(step === 'persona'){
+    const key = `${charState.conflict}|${charState.evidence}|${charState.decision}`;
+    const p = PERSONAS[key];
+    if(!p){
+      el.innerHTML = `<p class="blank-notice">⚑ Go back and finish choosing all three traits to reveal your persona.</p>`;
+      return;
+    }
+    el.innerHTML = `
+      <div class="eyebrow">Stage 4</div>
+      <h1 class="page-title">Your Persona</h1>
+      <div class="persona-reveal">
+        <div class="persona-scale">Warm Scale ${p.scale} of 3</div>
+        <div class="persona-name">${p.name}</div>
+        <div class="persona-nick">"${p.nick}"</div>
+        <div class="persona-code">${p.code} — ${charState.conflict} / ${charState.evidence} / ${charState.decision}</div>
+      </div>
+      <h3 class="mini-title">Likely Strength</h3>
+      <p>${p.strength}</p>
+      <h3 class="mini-title">Likely Failure Mode</h3>
+      <p>${p.failure}</p>
+      <div class="callout rule">
+        <div class="callout-label">⚑ Remember</div>
+        <p style="margin-bottom:0;">This is a playstyle signal, not a restriction. You can act against it whenever the fiction calls for it — you just won't get the d4 bonus for that particular move.</p>
+      </div>
+    `;
+    return;
+  }
+
+  if(step === 'bias'){
+    el.innerHTML = `
+      <div class="eyebrow">Stage 5</div>
+      <h1 class="page-title">Choose Your Professional Bias</h1>
+      <p>Your Bias is not a fourth trait. It's the principle you protect when pressure makes easy consensus tempting.</p>
+      <div id="biasList"></div>
+      <h3 class="mini-title">Write Your Hard Line (optional, in your own words)</h3>
+      <input class="concept-input" id="hardLineInput" placeholder="e.g. I will not let a sponsor's comfort come before a worker's safety." value="${charState.hardLine || ''}">
+    `;
+    const list = document.getElementById('biasList');
+    list.innerHTML = BIASES.map(b => optionCard(b.name, `${b.no}. ${b.name}`, null,
+      `Hard line: ${b.hardLine}`,
+      `Protects: ${b.protects} <br>Failure mode: ${b.failure} <br>Conflicts with: ${b.conflicts}`,
+      charState.bias===b.name)).join('');
+    list.querySelectorAll('.option-card').forEach(card=>{
+      card.addEventListener('click', ()=>{ charState.bias = card.dataset.id; renderCharacterStep(); updateNav(); });
+    });
+    document.getElementById('hardLineInput').addEventListener('input', (e)=>{ charState.hardLine = e.target.value; });
+    return;
+  }
+
+  if(step === 'concept'){
+    el.innerHTML = `
+      <div class="eyebrow">Stage 6</div>
+      <h1 class="page-title">Write Your Concept Sentence</h1>
+      <p>Who are you, and why does Cornerstone need you specifically? The best concept sentences name a professional strength and a professional tension at the same time.</p>
+      <div class="callout example">
+        <div class="callout-label">▸ Examples</div>
+        <p>"A state budget analyst who maps dependencies before other people realize they exist, and who expects the room to accept evidence once it is shown."</p>
+        <p style="margin-bottom:0;">"A turnaround specialist who kills bad initiatives before they kill institutions, and who sometimes forgets that sponsors need dignity, not just accuracy."</p>
+      </div>
+      <textarea class="concept-input" id="conceptInput" placeholder="Write one or two sentences...">${charState.concept || ''}</textarea>
+    `;
+    document.getElementById('conceptInput').addEventListener('input', (e)=>{ charState.concept = e.target.value; });
+    return;
+  }
+
+  if(step === 'summary'){
+    const key = `${charState.conflict}|${charState.evidence}|${charState.decision}`;
+    const p = PERSONAS[key];
+    const jobObj = JOBS.find(j=>j.name===charState.job);
+    const indObj = INDUSTRIES.find(i=>i.name===charState.industry);
+    const biasObj = BIASES.find(b=>b.name===charState.bias);
+
+    el.innerHTML = `
+      <div class="eyebrow">Character Record</div>
+      <h1 class="page-title">${charState.job ? "Coordinator, Class: " + charState.job : "Your Record"}</h1>
+
+      <div class="sheet">
+        <div class="sheet-section-head">Identity</div>
+        <div class="sheet-section-body">
+          <div class="sheet-line"><span class="sl-k">Job / Class</span><span class="sl-v">${charState.job || '—'}</span></div>
+          <div class="sheet-line"><span class="sl-k">Industry</span><span class="sl-v">${charState.industry || '—'}</span></div>
+          ${charState.concept ? `<div class="sheet-concept">"${charState.concept}"</div>` : ''}
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-section-head">Core — How You Operate</div>
+        <div class="sheet-section-body">
+          <div class="sheet-line"><span class="sl-k">Conflict</span><span class="sl-v">${charState.conflict || '—'}</span></div>
+          <div class="sheet-line"><span class="sl-k">Evidence</span><span class="sl-v">${charState.evidence || '—'}</span></div>
+          <div class="sheet-line"><span class="sl-k">Decision</span><span class="sl-v">${charState.decision || '—'}</span></div>
+          <div class="sheet-line"><span class="sl-k">Persona</span><span class="sl-v">${p ? `${p.name} (${p.code})` : '—'}</span></div>
+          <div class="sheet-line"><span class="sl-k">Warm Scale</span><span class="sl-v">${p ? p.scale + ' of 3' : '—'}</span></div>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-section-head">Ethics — What You Protect</div>
+        <div class="sheet-section-body">
+          <div class="sheet-line"><span class="sl-k">Professional Bias</span><span class="sl-v">${charState.bias || '—'}</span></div>
+          ${charState.hardLine ? `<div class="sheet-concept">Hard line: "${charState.hardLine}"</div>` : (biasObj ? `<div class="sheet-concept">Hard line: "${biasObj.hardLine}"</div>` : '')}
+          <div class="sheet-line"><span class="sl-k">Moral Friction</span><span class="sl-v">Clear</span></div>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-section-head">Execution — What You Do</div>
+        <div class="sheet-section-body">
+          <div class="sheet-line"><span class="sl-k">Job Passive</span><span class="sl-v">${jobObj ? jobObj.passive : '—'}</span></div>
+          ${jobObj ? `<div class="sheet-concept">${jobObj.effect}</div>` : ''}
+          <div class="sheet-line"><span class="sl-k">Industry Bonus</span><span class="sl-v">+1</span></div>
+          ${indObj ? `<div class="sheet-concept">Triggers when: ${indObj.trigger}</div>` : ''}
+        </div>
+      </div>
+
+      <button class="btn full" id="copyBtn" style="margin-bottom:14px;">Copy Character Record</button>
+
+      <hr class="rule-line">
+
+      <h2 class="sub-title">The Team Check</h2>
+      <p>Before your first session, answer these as a table — it takes two minutes and shapes the entire first arc.</p>
+      <div class="team-q">Are we heavy on Assertive or Collaborative?</div>
+      <div class="team-q">Are we heavy on Data-Minded or Instinct-Driven?</div>
+      <div class="team-q">Are we heavy on Pragmatic or Conviction?</div>
+      <div class="team-q">What will be hard for us because of what nobody naturally protects or notices?</div>
+    `;
+
+    document.getElementById('copyBtn').addEventListener('click', ()=>{
+      const text = buildRecordText();
+      navigator.clipboard.writeText(text).then(()=>{
+        showToast();
+      }).catch(()=>{
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); showToast(); }catch(e){}
+        document.body.removeChild(ta);
+      });
+    });
+    return;
+  }
+}
+
+function buildRecordText(){
+  const key = `${charState.conflict}|${charState.evidence}|${charState.decision}`;
+  const p = PERSONAS[key];
+  const jobObj = JOBS.find(j=>j.name===charState.job);
+  const indObj = INDUSTRIES.find(i=>i.name===charState.industry);
+  const biasObj = BIASES.find(b=>b.name===charState.bias);
+  const hardLine = charState.hardLine || (biasObj ? biasObj.hardLine : '');
+
+  return `THE CHARTERED REALM — CHARACTER RECORD
+----------------------------------------
+IDENTITY
+Job / Class: ${charState.job || '—'}
+Industry: ${charState.industry || '—'}
+Concept: ${charState.concept || '—'}
+
+CORE — HOW YOU OPERATE
+Conflict: ${charState.conflict || '—'}
+Evidence: ${charState.evidence || '—'}
+Decision: ${charState.decision || '—'}
+Persona: ${p ? `${p.name} "${p.nick}" (${p.code})` : '—'}
+Warm Scale: ${p ? p.scale + ' of 3' : '—'}
+
+ETHICS — WHAT YOU PROTECT
+Professional Bias: ${charState.bias || '—'}
+Hard Line: ${hardLine || '—'}
+Moral Friction: Clear
+
+EXECUTION — WHAT YOU DO
+Job Passive (${jobObj ? jobObj.passive : '—'}): ${jobObj ? jobObj.effect : '—'}
+Industry Bonus: +1 when ${indObj ? indObj.trigger : '—'}
+`;
+}
+
+function showToast(){
+  const t = document.getElementById('copyToast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function updateNav(){
+  const back = document.getElementById('btnBack');
+  const next = document.getElementById('btnNext');
+  back.disabled = charStep === 0;
+  const step = currentStepId();
+
+  let canAdvance = true;
+  if(step === 'job') canAdvance = !!charState.job;
+  if(step === 'industry') canAdvance = !!charState.industry;
+  if(step === 'traits') canAdvance = charState.conflict && charState.evidence && charState.decision;
+  if(step === 'bias') canAdvance = !!charState.bias;
+
+  if(charStep === CHAR_STEPS.length - 1){
+    next.style.display = 'none';
+  } else {
+    next.style.display = 'block';
+    next.disabled = !canAdvance;
+    next.textContent = (step === 'concept') ? 'Finish' : 'Next';
+  }
+}
+
+/* ============================================================
+   MODE SWITCH / INIT
+   ============================================================ */
+
+function setMode(newMode){
+  mode = newMode;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.toggle('active', t.dataset.mode===mode));
+  document.getElementById('rulesNav').style.display = mode==='rules' ? 'flex' : 'none';
+  document.getElementById('charProgressWrap').style.display = mode==='character' ? 'block' : 'none';
+  document.getElementById('wizardNav').style.display = mode==='character' ? 'flex' : 'none';
+  document.getElementById('statusRight').textContent = mode==='rules' ? 'CODEX V1.9' : 'CHARACTER FORGE';
+
+  if(mode === 'character'){
+    renderProgress();
+    renderCharacterStep();
+    updateNav();
+  } else {
+    renderRulesNav();
+    renderContent();
+  }
+  document.getElementById('content').scrollTop = 0;
+}
+
+document.querySelectorAll('.mode-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=> setMode(tab.dataset.mode));
+});
+
+document.getElementById('btnBack').addEventListener('click', ()=>{
+  if(charStep > 0){ charStep--; renderProgress(); renderCharacterStep(); updateNav(); document.getElementById('content').scrollTop=0; }
+});
+document.getElementById('btnNext').addEventListener('click', ()=>{
+  if(charStep < CHAR_STEPS.length - 1){ charStep++; renderProgress(); renderCharacterStep(); updateNav(); document.getElementById('content').scrollTop=0; }
+});
+
+renderRulesNav();
+renderContent();
+</script>
+</body>
+</html>
