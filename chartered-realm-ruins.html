@@ -22,6 +22,9 @@
   --lichen:#63744a;
   --lichen-bright:#7d9260;
 
+  --scrawl:#7c3b30;
+  --scrawl-bright:#9c4a3c;
+
   --line:#9a9c85;
   --line-soft:#adae97;
 
@@ -305,6 +308,111 @@ p{
   margin-top:8px;
 }
 
+/* ===== DEBATE TRANSCRIPT ===== */
+.debate-block{
+  border:1px solid var(--line);
+  background:var(--stone-deep);
+  padding:16px 18px 12px;
+  margin:20px 0;
+}
+.debate-label{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:#c7cbb8;
+  margin-bottom:12px;
+}
+.debate-line{margin:0 0 14px;}
+.debate-line:last-child{margin-bottom:0;}
+.debate-speaker{
+  display:block;
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--lichen-bright);
+  margin-bottom:3px;
+}
+.debate-text{
+  font-size:15px;
+  line-height:1.7;
+  color:#e4e1cf;
+  margin:0;
+}
+.debate-line.cut .debate-text{color:var(--ink-faint); font-style:italic;}
+
+/* ===== BENCH FIELD ===== */
+.bench-intro{
+  font-size:13.5px;
+  line-height:1.65;
+  color:var(--ink-faint);
+  font-style:italic;
+  margin:18px 0 10px;
+}
+.bench-field{
+  background:var(--ink);
+  border:1px solid #454838;
+  padding:10px;
+  margin:0 0 18px;
+}
+.bench-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(58px, 1fr));
+  gap:3px;
+}
+.bench-cell{
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:4px 3px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid #363a2c;
+  font-family:var(--font-mono);
+  font-size:8.5px;
+  line-height:1.25;
+  color:#71755f;
+  letter-spacing:0.02em;
+}
+.bench-cell.carved{color:#c7cbb8;}
+a.bench-cell{
+  text-decoration:none;
+  cursor:pointer;
+}
+a.bench-cell:hover, a.bench-cell:active{
+  background:rgba(125,146,96,0.28);
+  border-color:var(--lichen-bright);
+  color:#eef1e2;
+}
+
+/* ===== SCRAWLED WARNING (INNER CHAMBER) ===== */
+.scrawl-block{
+  border:1px dashed var(--scrawl);
+  background:rgba(124,59,48,0.06);
+  padding:18px 20px 16px;
+  margin:22px 0;
+  transform:rotate(-0.4deg);
+}
+.scrawl-eyebrow{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--scrawl-bright);
+  margin-bottom:10px;
+}
+.scrawl-text{
+  font-family:var(--font-read);
+  font-style:italic;
+  font-size:16px;
+  line-height:1.85;
+  color:var(--ink);
+}
+.scrawl-text p{font-size:inherit; line-height:inherit; margin:0 0 10px;}
+.scrawl-text p:last-child{margin-bottom:0;}
+
 @media (max-width:380px){
   h1.site-title{font-size:19px;}
   p{font-size:15.5px;}
@@ -336,6 +444,7 @@ p{
 const SECTIONS = [
   { id:"approach", title:"Approaching the Ruin" },
   { id:"mural", title:"The Outer Wall" },
+  { id:"assembly", title:"The Assembly Floor" },
   { id:"warning", title:"The Inner Chamber" }
 ];
 
@@ -408,6 +517,46 @@ function renderMural(){
   `;
 }
 
+function renderAssembly(){
+  document.getElementById('statusRight').textContent = 'THE ASSEMBLY FLOOR';
+  return `
+    <div class="eyebrow">A Room Built for an Argument That Was Never Finished</div>
+    <h1 class="site-title">The Assembly Floor</h1>
+    <p>You enter a large room filled entirely with benches, row after row of them, facing a low stone dais at the center. Half the ceiling is gone, and moss has taken the benches nearest the walls, but the rows nearest the dais are only ever swept, never repaired, as though someone still expects them to be needed again. Past the dais, a narrow gap in the far wall leads deeper into the tower.</p>
+    <p>This was not a chapel and it was not a courtroom. The seating makes that plain to anyone who bothers to count it: three blocks of benches, angled to face each other nearly as much as they face the dais, built for a room where people expected to disagree and still needed to hear one another do it.</p>
+
+    <div class="debate-block">
+      <div class="debate-label">FRAGMENT, CUT INTO THE DAIS RAIL &middot; HAND UNKNOWN</div>
+      <div class="debate-line">
+        <span class="debate-speaker">Elven voice</span>
+        <p class="debate-text">"You ask us to trust a promise none of us will live to see broken. That has always been the human gift and the human risk in the same breath: you build things that outlast your own certainty about them."</p>
+      </div>
+      <div class="debate-line">
+        <span class="debate-speaker">Dwarven voice</span>
+        <p class="debate-text">"Trust isn't the word I'd use. A charter is a claim. Claims get audited. I don't care how it feels when it's signed — I care whether it still holds the third time someone checks it."</p>
+      </div>
+      <div class="debate-line">
+        <span class="debate-speaker">Human voice</span>
+        <p class="debate-text">"It holds because we hold it. That was never a trick. It was the whole of what we had to offer the rest of you — not a craft, not a ledger, just enough hands willing to keep reaching for the same thing at the same time."</p>
+      </div>
+      <div class="debate-line">
+        <span class="debate-speaker">Orcish voice</span>
+        <p class="debate-text">"Then say that plainly and stop dressing it up as architecture. My clan doesn't need a tower to keep a word. We need to know that when yours breaks, you'll say so to our faces instead of drafting a committee to explain it. Build your Chain. But build it so it holds, or don't ask us to stand under it when it doesn't."</p>
+      </div>
+      <div class="debate-line cut">
+        <span class="debate-speaker">Elven voice</span>
+        <p class="debate-text">"And if something out there has always been listening for exactly that many hands, reaching at once—"</p>
+      </div>
+    </div>
+
+    <p class="bench-intro">Most of the benches say nothing at all. Seven hundred years of visitors have left the room otherwise silent. If there is anything to find here, it isn't going to announce itself.</p>
+
+    <div class="bench-field">
+      <div class="bench-grid" id="benchGrid"></div>
+    </div>
+  `;
+}
+
 function renderWarning(){
   document.getElementById('statusRight').textContent = 'THE INNER CHAMBER';
   return `
@@ -432,14 +581,63 @@ function renderWarning(){
       </div>
     </div>
 
-    <p class="closing">Whoever, or whatever, carved that wall clearly believes it was protecting something. Whether that makes the warning easier to ignore, or harder, is not a question this ruin is going to answer for you.</p>
+    <div class="scrawl-block">
+      <div class="scrawl-eyebrow">Scratched Into The Floor Near The Threshold &middot; Hurried, Uneven &middot; Nothing Like The Wall</div>
+      <div class="scrawl-text">
+        <p>It answered before I finished reading. I only lived because I hadn't gone back to the benches yet.</p>
+        <p>Whatever's sitting in that room, under the rows they still keep swept, like someone always knew they'd need them again — that's the piece it wants back. Find it first, if you're going to find it at all.</p>
+        <p>Don't read the wall a second time out loud.</p>
+      </div>
+    </div>
+
+    <p class="closing">Whoever, or whatever, carved that wall clearly believes it was protecting something. Whether that makes the warning easier to ignore, or harder, is not a question this ruin is going to answer for you. If you're only now noticing the benches you walked past to get here, that unease is doing exactly what it's supposed to.</p>
   `;
+}
+
+/* ============================================================
+   BENCH FIELD
+   Most cells just show their own row/seat code. A handful carry
+   short carved text instead — decoys, meant to slow a reader down.
+   Exactly one is a real link. Its coordinates (row/seat) are the
+   thing the Inner Chamber riddle should eventually point players to.
+   ============================================================ */
+const BENCH_ROWS = 12;
+const BENCH_SEATS = 14;
+
+// key = "R{row}-S{seat}" (1-indexed)
+const BENCH_SPECIALS = {
+  "R2-S7":   { text: "warm to the touch, for no reason anyone's found" },
+  "R3-S9":   { text: "a child's initials, badly carved" },
+  "R6-S2":   { text: "tally marks, six of them, then nothing" },
+  "R10-S5":  { text: "a name, scratched out twice" },
+  "R11-S11": { text: "a heart, badly carved, two names too worn to read" },
+  // the real find:
+  "R8-S13":  { text: "IT NEVER LEFT", link: "chartered-realm-timecapsule.html" }
+};
+
+function buildBenchField(){
+  const grid = document.getElementById('benchGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  for(let r = 1; r <= BENCH_ROWS; r++){
+    for(let s = 1; s <= BENCH_SEATS; s++){
+      const key = `R${r}-S${s}`;
+      const special = BENCH_SPECIALS[key];
+      const label = special ? special.text : key;
+      const el = document.createElement(special && special.link ? 'a' : 'div');
+      el.className = 'bench-cell' + (special ? ' carved' : '');
+      el.textContent = label;
+      if(special && special.link) el.href = special.link;
+      grid.appendChild(el);
+    }
+  }
 }
 
 function renderPage(){
   const page = document.getElementById('page');
   if(activeSection === 'approach') page.innerHTML = renderApproach();
   else if(activeSection === 'mural') page.innerHTML = renderMural();
+  else if(activeSection === 'assembly') page.innerHTML = renderAssembly();
   else page.innerHTML = renderWarning();
 
   page.querySelectorAll('.rubbing-surface.unrubbed').forEach(surf=>{
@@ -449,6 +647,8 @@ function renderPage(){
       page.querySelector(`.rubbing-revealed[data-panel="${panel}"]`).classList.add('shown');
     });
   });
+
+  if(activeSection === 'assembly') buildBenchField();
 }
 
 renderNav();

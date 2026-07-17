@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Handhold — The Assembly Floor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Metamorphous&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dusk:#20241f;
+  --dusk-edge:#12140f;
+
+  --stone:#8b8f7c;
+  --stone-deep:#63665a;
+
+  --ink:#232620;
+  --ink-muted:#54574a;
+  --ink-faint:#82836f;
+
+  --lichen:#63744a;
+  --lichen-bright:#7d9260;
+
+  --gold:#96701f;
+  --gold-bright:#b98f2f;
+
+  --scrawl:#7c3b30;
+  --scrawl-bright:#9c4a3c;
+
+  --line:#9a9c85;
+  --line-soft:#adae97;
+
+  --font-carved:'Metamorphous', 'Times New Roman', serif;
+  --font-read:'Crimson Text', Georgia, serif;
+  --font-mono:'Fira Mono', 'Courier New', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--dusk-edge);
+  font-family:var(--font-read);
+  color:var(--ink);
+  -webkit-tap-highlight-color:transparent;
+  min-height:100vh;
+  min-height:100dvh;
+}
+
+.site{
+  max-width:560px;
+  margin:0 auto;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(ellipse at 50% 0%, #2c3128 0%, var(--dusk) 55%, var(--dusk-edge) 100%);
+}
+.site-label{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.12em;
+  color:#8a9276;
+  text-align:center;
+  padding:10px 14px 5px;
+  text-transform:uppercase;
+}
+
+.frame{
+  position:relative;
+  flex:1;
+  margin:0 10px 10px;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px #0e100c, inset 0 0 50px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.6);
+  background:var(--stone);
+}
+.frame::before{
+  content:"";
+  position:absolute; inset:0;
+  pointer-events:none;
+  z-index:50;
+  opacity:0.4;
+  background:repeating-linear-gradient(100deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 4px);
+  mix-blend-mode:multiply;
+}
+
+.page{
+  position:relative;
+  z-index:2;
+  padding:22px 18px 44px;
+}
+
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--lichen);
+  margin:0 0 6px;
+}
+h1.site-title{
+  font-family:var(--font-carved);
+  font-size:24px;
+  font-weight:400;
+  margin:0 0 16px;
+  line-height:1.3;
+  border-bottom:2px solid var(--line);
+  padding-bottom:12px;
+  color:var(--ink);
+}
+p{
+  font-size:16.5px;
+  line-height:1.78;
+  margin:0 0 14px;
+  max-width:66ch;
+}
+
+.divider{
+  text-align:center;
+  color:var(--lichen);
+  font-size:13px;
+  letter-spacing:0.4em;
+  margin:20px 0;
+  opacity:0.6;
+}
+
+/* ===== RELIC PANEL ===== */
+.relic-panel{
+  border:1px solid var(--line);
+  background:var(--stone-deep);
+  padding:20px 20px 18px;
+  margin:20px 0;
+}
+.relic-eyebrow{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:#c7cbb8;
+  margin-bottom:10px;
+}
+.relic-name{
+  font-family:var(--font-carved);
+  font-size:20px;
+  font-weight:400;
+  color:#eef1e2;
+  margin:0 0 12px;
+}
+.relic-panel p{
+  color:#e4e1cf;
+  font-size:15.5px;
+  margin:0 0 12px;
+}
+.relic-panel p:last-child{margin-bottom:0;}
+
+/* ===== SEALED LETTER ===== */
+.letter{
+  border:1px solid var(--line-soft);
+  background:#e4e1cf;
+  padding:22px 22px 20px;
+  margin:20px 0;
+}
+.letter-eyebrow{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:14px;
+  border-bottom:1px dashed var(--ink-faint);
+  padding-bottom:10px;
+}
+.letter-body{
+  font-family:var(--font-read);
+  font-style:italic;
+  font-size:16px;
+  line-height:1.9;
+  color:var(--ink);
+}
+.letter-body p{font-size:inherit; line-height:inherit; margin:0 0 10px; max-width:none;}
+.letter-verse{
+  margin:16px 0;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.04);
+  border-left:3px solid var(--gold);
+}
+.letter-verse p{margin:0 0 6px;}
+.letter-verse p:last-child{margin-bottom:0;}
+.letter-verse .cap{
+  font-weight:700;
+  font-style:normal;
+  color:var(--gold);
+}
+.letter-sign{
+  text-align:right;
+  margin-top:16px;
+  font-size:15px;
+}
+
+/* ===== OOC TRIGGER ===== */
+.ooc{
+  border:2px dashed var(--scrawl);
+  background:rgba(124,59,48,0.08);
+  padding:18px 20px;
+  margin:24px 0 10px;
+}
+.ooc-label{
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--scrawl-bright);
+  margin-bottom:8px;
+}
+.ooc-line{
+  font-family:var(--font-mono);
+  font-size:15px;
+  color:var(--ink);
+  margin:0 0 8px;
+  font-weight:700;
+}
+.ooc-note{
+  font-size:13.5px;
+  line-height:1.6;
+  color:var(--ink-muted);
+  margin:0;
+  max-width:none;
+}
+
+.back{
+  display:inline-block;
+  margin-top:8px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--lichen-bright);
+  text-decoration:none;
+  border-bottom:1px solid var(--lichen);
+  padding-bottom:2px;
+}
+
+.closing{
+  font-style:italic;
+  color:var(--ink-muted);
+  border-top:1px solid var(--line-soft);
+  padding-top:16px;
+  margin-top:6px;
+}
+
+@media (max-width:380px){
+  h1.site-title{font-size:20px;}
+  p{font-size:15.5px;}
+}
+</style>
+</head>
+<body>
+<a href="chartered-realm-ruins.html" style="position:fixed;top:8px;left:8px;z-index:999;background:rgba(0,0,0,0.6);color:#ecdfc0;font-family:monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:6px 10px;border-radius:3px;text-decoration:none;border:1px solid rgba(255,255,255,0.25);">&#8592; Ruin</a>
+
+<div class="site">
+  <div class="site-label">THE ASSEMBLY FLOOR &middot; BENEATH THE LOOSE FLAGSTONE</div>
+
+  <div class="frame">
+    <div class="page">
+      <div class="eyebrow">It Never Left</div>
+      <h1 class="site-title">The Handhold</h1>
+
+      <p>The flagstone lifts easier than seven hundred years should allow, and the space beneath it hasn't collected the dust the rest of the room has. Whoever set this here meant for it to be found intact, by someone who was still looking.</p>
+      <p>Inside is a plain lead box, unlocked, the kind of container that survives fire, flood, and most kinds of curious hands. It has clearly survived at least the first two. Inside that: a shaped piece of old-Compact work, and a letter, sealed with wax that has not cracked in seven centuries.</p>
+
+      <div class="divider">✦ ✦ ✦</div>
+
+      <div class="relic-panel">
+        <div class="relic-eyebrow">Relic Recovered &middot; Condition: Whole</div>
+        <div class="relic-name">The Handhold</div>
+        <p>Three interlocking pieces, small enough to close in one fist joined together. One is cut resonance-crystal, unmistakably elven work, its facets holding a faint warmth the way the Library's terminal-crystal does. One is worked metal, dwarven in its precision, stamped along the inner curve with a maker's mark that has clearly been checked, re-checked, and re-stamped by hands generations apart. The third is dense, dark wood rather than metal or stone — orcish work, carved plain and fitted so precisely to the other two that it could only have been shaped after both were already finished.</p>
+        <p>Three pieces. Three peoples. On the outer wall, the mural shows exactly three figures with their hands joined, and no fourth figure standing among them — that was never an oversight. Humanity had no craft to leave carved into wood, metal, or crystal. What it had instead was the part that doesn't hold a shape on its own: the letter, sealed separately in this same box, is the fourth piece. Not a fourth hand. The reason the other three stayed closed around each other at all.</p>
+        <p>Fitted together, the three pieces form the same shape as the joined hands on the outer wall's first panel — the one carved beneath the word <em>together</em>, the one erased on the panel beside it.</p>
+        <p>Nothing about it hums, glows, or announces itself. It does not need to. Whoever built it understood that the object was never the point. The point was always what it took to make three different hands agree to close around it at once.</p>
+      </div>
+
+      <div class="divider">✦ ✦ ✦</div>
+
+      <div class="letter">
+        <div class="letter-eyebrow">Sealed Letter &middot; Wax Unbroken Until Now</div>
+        <div class="letter-body">
+          <p>To whoever pried this stone loose, and meant to —</p>
+          <p>If you found this by accident, put it back and tell no one. If you found it because you were looking, then you already understand something most of Cornerstone has spent seven hundred years forgetting on purpose, and I am sorry to tell you that understanding it was never the hard part.</p>
+          <p>I do not know if the Chain can be relit. I do not know if what silenced it is still listening, or only sleeping, or something in between our old words were never built to describe. I know that whatever it is, it noticed us the moment we stopped working alone. I know it will notice you too, the moment this box is open and the reason you're reading this is that you three, or five, or however many of you there are, decided to reach for the same thing at the same time.</p>
+          <p>That was always going to be the cost. We decided, all those years ago, that it was worth paying once. I am asking you, whoever you are, to decide the same thing again.</p>
+
+          <div class="letter-verse">
+            <p><span class="cap">U</span>nder stone, under moss, under all we could no longer say aloud,</p>
+            <p><span class="cap">N</span>othing we built was ever meant to end in silence.</p>
+            <p><span class="cap">S</span>till the Chain answers, if you know which dark tower still listens.</p>
+            <p><span class="cap">E</span>very hand we joined, it counted. It is still counting.</p>
+            <p><span class="cap">V</span>ow-bound, we did not break faith with each other; we were broken instead.</p>
+            <p><span class="cap">E</span>ven now the last light waits, in the furthest tower, not gone — only quiet.</p>
+            <p><span class="cap">R</span>eturn what was taken. Together. And see what answers back.</p>
+          </div>
+
+          <p>Read the first letter of each line before you close this box. It was the only way I trusted this letter to survive being read by the wrong hands and mean nothing to them.</p>
+          <p>Whatever comes next, don't do it alone. That was the mistake the first time.</p>
+
+          <div class="letter-sign">— unsigned, deliberately</div>
+        </div>
+      </div>
+
+      <p class="closing">The Handhold sits heavier in your palm than three small pieces of crystal, metal, and iron have any right to. Somewhere, something that has not been paying attention to Cornerstone in a very long time has just started to.</p>
+
+      <div class="ooc">
+        <div class="ooc-label">Out of Character — For the Table, Not the Characters</div>
+        <p class="ooc-line">Tell your GM: "We found the Handhold."</p>
+        <p class="ooc-note">That line is the whole trigger. Your GM will know what it means for how this session ends — you don't need to solve anything further to have earned it. What you do with the letter is up to your table.</p>
+      </div>
+
+      <a class="back" href="chartered-realm-ruins.html">&#8592; Back to the Ruin</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
