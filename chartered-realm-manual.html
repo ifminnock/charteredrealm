@@ -420,6 +420,13 @@ hr.rule-line{
 }
 
 .trait-slot{margin-bottom:20px;}
+.trait-slot-question{
+  font-style:italic;
+  font-size:14px;
+  line-height:1.55;
+  color:var(--ink-muted);
+  margin:2px 0 10px;
+}
 .trait-slot-title{
   font-family:var(--font-system);
   font-size:11px;
@@ -679,18 +686,27 @@ const INDUSTRIES = [
 ];
 
 const TRAITS = {
-  Conflict: [
-    {key:"Assertive", desc:"Push, hold ground, direct."},
-    {key:"Collaborative", desc:"Build consensus, shared ownership."}
-  ],
-  Evidence: [
-    {key:"Data-Minded", desc:"Trust documentation and analysis."},
-    {key:"Instinct-Driven", desc:"Read patterns and field judgment."}
-  ],
-  Decision: [
-    {key:"Pragmatic", desc:"Identify critical path, act without sentiment."},
-    {key:"Conviction", desc:"Commit publicly, make others believe."}
-  ]
+  Conflict: {
+    question: "When a disagreement won't resolve itself and the room is waiting on you — do you push it toward a decision, or refuse to let it move until everyone's actually been heard?",
+    options: [
+      {key:"Collaborative", desc:"Build consensus, shared ownership."},
+      {key:"Assertive", desc:"Push, hold ground, direct."}
+    ]
+  },
+  Evidence: {
+    question: "The numbers and your gut just told you two different things, and there's no time to check both. Which one do you trust?",
+    options: [
+      {key:"Data-Minded", desc:"Trust documentation and analysis."},
+      {key:"Instinct-Driven", desc:"Read patterns and field judgment."}
+    ]
+  },
+  Decision: {
+    question: "When it's finally time to commit, what matters more — that the plan is right, or that the people following it actually believe in it?",
+    options: [
+      {key:"Pragmatic", desc:"Identify critical path, act without sentiment."},
+      {key:"Conviction", desc:"Commit publicly, make others believe."}
+    ]
+  }
 };
 
 // key = Conflict|Evidence|Decision using full trait names
@@ -898,7 +914,7 @@ function renderTraits(){
 
   <table class="mini-table">
     <tr><th>Slot</th><th>Option A</th><th>Option B</th></tr>
-    <tr><td><strong>Conflict</strong></td><td><strong>Assertive</strong> — push, hold ground, direct.</td><td><strong>Collaborative</strong> — build consensus, shared ownership.</td></tr>
+    <tr><td><strong>Conflict</strong></td><td><strong>Collaborative</strong> — build consensus, shared ownership.</td><td><strong>Assertive</strong> — push, hold ground, direct.</td></tr>
     <tr><td><strong>Evidence</strong></td><td><strong>Data-Minded</strong> — trust documentation and analysis.</td><td><strong>Instinct-Driven</strong> — read patterns and field judgment.</td></tr>
     <tr><td><strong>Decision</strong></td><td><strong>Pragmatic</strong> — identify critical path, act without sentiment.</td><td><strong>Conviction</strong> — commit publicly, make others believe.</td></tr>
   </table>
@@ -1202,7 +1218,7 @@ function renderCheatsheet(){
   <h2 class="sub-title">Trait Slots</h2>
   <table class="mini-table">
     <tr><th>Slot</th><th>Options</th></tr>
-    <tr><td>Conflict</td><td>Assertive / Collaborative</td></tr>
+    <tr><td>Conflict</td><td>Collaborative / Assertive</td></tr>
     <tr><td>Evidence</td><td>Data-Minded / Instinct-Driven</td></tr>
     <tr><td>Decision</td><td>Pragmatic / Conviction</td></tr>
   </table>
@@ -1337,15 +1353,16 @@ function renderCharacterStep(){
     el.innerHTML = `
       <div class="eyebrow">Stage 3</div>
       <h1 class="page-title">Choose Your Dominant Traits</h1>
-      <p>Pick one trait in each slot. These three choices create your persona and determine when you add the d4 bonus.</p>
+      <p>Before Cornerstone ever meets you, decide who you already are under pressure. Three questions, three answers — there's no wrong one, just the shape of how you move when a room goes sideways.</p>
       <div id="traitSlots"></div>
     `;
     const wrap = document.getElementById('traitSlots');
     wrap.innerHTML = Object.keys(TRAITS).map(slot => `
       <div class="trait-slot">
         <div class="trait-slot-title">${slot}</div>
+        <div class="trait-slot-question">${TRAITS[slot].question}</div>
         <div class="trait-choice-row">
-          ${TRAITS[slot].map(t => `
+          ${TRAITS[slot].options.map(t => `
             <div class="trait-choice ${charState[slot.toLowerCase()]===t.key?'selected':''}" data-slot="${slot.toLowerCase()}" data-key="${t.key}">
               <div class="tc-name">${t.key}</div>
               <div class="tc-desc">${t.desc}</div>

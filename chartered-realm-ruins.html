@@ -448,7 +448,9 @@ const SECTIONS = [
   { id:"warning", title:"The Inner Chamber" }
 ];
 
-let activeSection = "approach";
+const VALID_SECTIONS = SECTIONS.map(s => s.id);
+const initialHash = window.location.hash.replace('#','');
+let activeSection = VALID_SECTIONS.includes(initialHash) ? initialHash : "approach";
 
 function renderNav(){
   const nav = document.getElementById('nav');
@@ -458,6 +460,7 @@ function renderNav(){
   nav.querySelectorAll('.nav-pill').forEach(p=>{
     p.addEventListener('click', ()=>{
       activeSection = p.dataset.id;
+      window.location.hash = activeSection;
       renderNav();
       renderPage();
       document.getElementById('page').scrollTop = 0;
@@ -549,7 +552,7 @@ function renderAssembly(){
       </div>
     </div>
 
-    <p class="bench-intro">Most of the benches say nothing at all. Seven hundred years of visitors have left the room otherwise silent. If there is anything to find here, it isn't going to announce itself.</p>
+    <p class="bench-intro">Most of the benches say nothing at all. Seven hundred years of visitors have left the room otherwise silent. If there is anything to find here, it isn't going to announce itself. Tap a bench to search it.</p>
 
     <div class="bench-field">
       <div class="bench-grid" id="benchGrid"></div>
@@ -598,11 +601,14 @@ function renderWarning(){
    BENCH FIELD
    Most cells just show their own row/seat code. A handful carry
    short carved text instead — decoys, meant to slow a reader down.
-   Exactly one is a real link. Its coordinates (row/seat) are the
-   thing the Inner Chamber riddle should eventually point players to.
+   Every bench is a real link. Wrong ones go to a plain "nothing
+   here" page; exactly one (its coordinates are the thing the Inner
+   Chamber riddle should eventually point players to) goes to the
+   time capsule.
    ============================================================ */
 const BENCH_ROWS = 12;
 const BENCH_SEATS = 14;
+const BENCH_DEAD_END = "chartered-realm-nothingofinterest.html";
 
 // key = "R{row}-S{seat}" (1-indexed)
 const BENCH_SPECIALS = {
@@ -624,10 +630,10 @@ function buildBenchField(){
       const key = `R${r}-S${s}`;
       const special = BENCH_SPECIALS[key];
       const label = special ? special.text : key;
-      const el = document.createElement(special && special.link ? 'a' : 'div');
+      const el = document.createElement('a');
       el.className = 'bench-cell' + (special ? ' carved' : '');
       el.textContent = label;
-      if(special && special.link) el.href = special.link;
+      el.href = (special && special.link) ? special.link : BENCH_DEAD_END;
       grid.appendChild(el);
     }
   }

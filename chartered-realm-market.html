@@ -317,6 +317,45 @@ h1.title{
   color:#9c8563;
 }
 
+.press-further{
+  margin-top:10px;
+  padding-top:12px;
+  border-top:1px dashed var(--line-soft);
+}
+.frame.tavern-active .press-further{border-top-color:#5a4630;}
+.press-reveal .press-line{
+  font-size:14.5px;
+  font-style:italic;
+  line-height:1.68;
+  color:var(--ink-muted);
+  margin:0 0 10px;
+  padding-left:12px;
+  border-left:2px solid var(--brass);
+}
+.frame.tavern-active .press-reveal .press-line{color:#c9bd9e; border-left-color:var(--brass-bright);}
+.press-btn{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:#fff6e0;
+  background:var(--brass);
+  border:1px solid var(--brass);
+  border-radius:1px;
+  padding:9px 14px;
+  cursor:pointer;
+}
+.press-btn:active{background:var(--brass-bright);}
+.press-btn:disabled{
+  background:transparent;
+  color:var(--ink-faint);
+  border-color:var(--line-soft);
+  cursor:default;
+  font-style:italic;
+  text-transform:none;
+  letter-spacing:0;
+}
+
 .divider{
   text-align:center;
   color:var(--brass);
@@ -592,7 +631,12 @@ const TAVERN_RUMORS = {
       tag:"tag-verdigris",
       tagLabel:"CONSENSUS: NOBODY WANTS IT TO BE TRUE",
       teaser:"A carter swears a dead relay tower had a light in it three nights running.",
-      body:`<p>A carter swears one of the old relay towers out past the north fields had a light in it three nights running last month, faint, like something waking up tired. Nobody's gone out to check. Most people here would rather not know which answer they'd prefer.</p>`
+      body:`<p>A carter swears one of the old relay towers out past the north fields had a light in it three nights running last month, faint, like something waking up tired. Nobody's gone out to check. Most people here would rather not know which answer they'd prefer.</p>`,
+      presses:[
+        "You ask the tavern-keep herself, half-joking, mid-shift. She doesn't laugh. \"Third night was the last night,\" she says, wiping the same spot on the bar for a while. \"After that it just stayed quiet.\" She doesn't offer anything else, and doesn't quite meet your eyes when she says it.",
+        "You ask how she'd know anything about a light on a tower she's never been within ten miles of, by her own account. She looks at you a second too long. \"Everyone in this city's father or grandfather worked that road once,\" she says. \"Doesn't mean I've been.\" She's back at the taps before you can ask which one of hers did.",
+        "You push once more. She sets the mug down, quiet, and says only: \"If you go out there, and you find something that was never supposed to still be there — don't carry it back into this city in the open. Wrap it. Keep it low. And don't say its name in here again.\" Then she walks to the far end of the bar and doesn't come back to this conversation, tonight or any other night you ask her."
+      ]
     }
   ]
 };
@@ -600,7 +644,16 @@ const TAVERN_RUMORS = {
 /* ============================================================
    RENDER HELPERS
    ============================================================ */
+let pressProgress = {};
+
 function cardHTML(item, idx, groupId){
+  const pressId = `${groupId}-${idx}`;
+  const pressBlock = item.presses ? `
+      <div class="press-further" data-press-id="${pressId}">
+        <div class="press-reveal" id="press-reveal-${pressId}"></div>
+        <button class="press-btn" type="button" data-press-id="${pressId}">Press her further</button>
+      </div>
+    ` : '';
   return `
     <div class="card" data-group="${groupId}" data-idx="${idx}">
       <div class="card-head">
@@ -611,15 +664,39 @@ function cardHTML(item, idx, groupId){
         </div>
         <span class="chevron">▾</span>
       </div>
-      <div class="card-body">${item.body}</div>
+      <div class="card-body">${item.body}${pressBlock}</div>
     </div>
   `;
 }
 
-function bindCards(container){
+function bindCards(container, items){
   container.querySelectorAll('.card-head').forEach(head=>{
     head.addEventListener('click', ()=>{
       head.closest('.card').classList.toggle('open');
+    });
+  });
+  if(!items) return;
+  container.querySelectorAll('.press-btn').forEach(btn=>{
+    const pressId = btn.dataset.pressId;
+    const idx = parseInt(pressId.split('-').pop(), 10);
+    const item = items[idx];
+    if(!item || !item.presses) return;
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const current = pressProgress[pressId] || 0;
+      if(current >= item.presses.length){ return; }
+      const reveal = document.getElementById(`press-reveal-${pressId}`);
+      const line = document.createElement('p');
+      line.className = 'press-line';
+      line.textContent = item.presses[current];
+      reveal.appendChild(line);
+      pressProgress[pressId] = current + 1;
+      if(pressProgress[pressId] >= item.presses.length){
+        btn.textContent = "She won't say anything more tonight.";
+        btn.disabled = true;
+      } else {
+        btn.textContent = "Press her further";
+      }
     });
   });
 }
@@ -672,7 +749,7 @@ function renderTavernRumors(){
   html += `<p class="intro">${TAVERN_RUMORS.intro}</p>`;
   TAVERN_RUMORS.rumors.forEach((r,i)=>{ html += cardHTML(r, i, 'rumors'); });
   content.innerHTML = html;
-  bindCards(content);
+  bindCards(content, TAVERN_RUMORS.rumors);
 }
 
 function renderTavern(){
